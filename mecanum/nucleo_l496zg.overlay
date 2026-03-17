@@ -1,119 +1,226 @@
 / {
-    pwm_motors {
-        compatible = "pwm_motors";
-        #address-cells = <1>';
-        #size-cells = <0>;
-
-        pwm_fl:pwm@0 {
-            compatible = "pwm_motors";
-            reg = <0>;
-            pwms = <&pwm2 2 PWM_MSEC(20)>, <&pwm2 3 PWM_MSEC(20)>;
-            status = "okay";
-        };
-
-        pwm_fr:pwm@1 {
-            compatible = "pwm_motors";
-            reg = <1>;
-            pwms = <&pwm2 4 PWM_MSEC(20)>, <&pwm2 5 PWM_MSEC(20)>;
-            status = "okay";
-        };
-
-        pwm_bl:pwm@2 {
-            compatible = "pwm_motors";
-            reg = <2>;
-            pwms = <&pwm2 6 PWM_MSEC(20)>, <&pwm2 7 PWM_MSEC(20)>;
-            status = "okay";
-        };
-
-        pwm_br:pwm@3 {
-            compatible = "pwm_motors";
-            reg = <3>;
-            pwms = <&pwm2 8 PWM_MSEC(20)>, <&pwm2 9 PWM_MSEC(20)>;
-            status = "okay";
-        };
-
+    aliases {
+        pwm-fl = &pwm_fl;
+        pwm-fr = &pwm_fr;
+        pwm-bl = &pwm_bl;
+        pwm-br = &pwm_br;
+        qdec-fl = &qdec_fl;
+        qdec-fr = &qdec_fr;
+        qdec-bl = &qdec_bl;
+        qdec-br = &qdec_br;
     };
 
-
-    qdec_fl:qdec_fl {
-        compatible = "st,stm32-qdec";
-        status = "okay";
-        pinctrl-0 = <&tim1_ch1_pa8 &tim1_ch2_pa9>;
-        pinctrl-names = "default";
-        st,autoload = <0xffffffff>;
+    /*описание моторов ШИМ */
+    pwm_fl: pwm-fl {
+        compatible = "pwm-leds"; //источник ШИМ сигнала
+        pwm-fl-pwm {
+            pwms = <&tim1 1 1000 PWM_POLARITY_NORMAL>; // TIM1_CH1
+        };
     };
 
-    qdec_fr:qdec_fr {
-        compatible = "st,stm32-qdec";
-        status = "okay";
-        pinctrl-0 = <&tim2_ch1_pa0 &tim2_ch2_pa1>;
-        pinctrl-names = "default";
-        st,autoload = <0xffffffff>;
+    pwm_fr: pwm-fr {
+        compatible = "pwm-leds";
+        pwm-fr-pwm {
+            pwms = <&tim1 3 1000 PWM_POLARITY_NORMAL>; // TIM1_CH3
+        };
     };
 
-    qdec_bl:qdec_bl {
-        compatible = "st,stm32-qdec";
-        status = "okay";
-        pinctrl-0 = <&tim3_ch1_pb4 &tim3_ch2_pb5>;
-        pinctrl-names = "default";
-        st,autoload = <0xffffffff>;
+    pwm_bl: pwm-bl {
+        compatible = "pwm-les";
+        pwm-bl-pwm {
+            pwms = <&tim2 1 1000 PWM_POLARITY_NORMAL>; // TIM2_CH1
+        };
     };
 
-    qdec_br:qdec_br {
+    pwm_br: pwm-br {
+        compatible = "pwm-leds";
+        pwm-br-pwm {
+            pwms = <&tim17 1 1000 PWM_POLARITY_NORMAL>; //TIM17_CH1
+        };
+    };
+
+    /* GPIO для направления моторов */
+    gpio-motor-dir {
+        compatible = "gpio-leds";
+        in_fl_a: in-fl-a {
+            gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_fl_b: in-fl-b {
+            gpios = <&gpiob 14 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_fr_a: in-fr-a {
+            gpios = <&gpioe 10 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_fr_b: in-fr-b {
+            gpios = <&gpioe 11 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_bl_a: in-bl-a {
+            gpios = <&gpiob 8 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_bl_b: in-bl-b {
+            gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_br_a: in-br-a {
+            gpios = <&gpioa 5 GPIO_ACTIVE_HIGH>;
+        };
+
+        compatible = "gpio-leds";
+        in_br_b: in-br-b {
+            gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>;
+        };
+    };
+
+    /* энкодеры через QDEC */
+    qdec_fl: qdec-fl {
         compatible = "st,stm32-qdec";
-        status = "okay";
-        pinctrl-0 = <&tim4_ch1_pb6 &tim4_ch2_pb7>;
+        pinctrl-0 = <&qdec_fl_pins>;
         pinctrl-names = "default";
-        st,autoload = <0xffffffff>;
+        st, encoder-mode = <2>;
+        status = "okay";
+    };
+
+    qdec_fr: qdec-fr {
+        compatible = "st,stm32-qdec";
+        pinctrl-0 = <&qdec_fr_pins>;
+        pinctrl-names = "default";
+        st, encoder-mode = <2>;
+        status = "okay";
+    };
+
+    qdec_bl: qdec-bl {
+        compatible = "st,stm32-qdec";
+        pinctrl-0 = <&qdec_bl_pins>;
+        pinctrl-names = "default";
+        st, encoder-mode = <2>;
+        status = "okay";
+    };
+
+    qdec_br: qdec-br {
+        compatible = "st,stm32-qdec";
+        pinctrl-0 = <&qdec_br_pins>;
+        pinctrl-names = "default";
+        st, encoder-mode = <2>;
+        status = "okay";
+    };
+
+    /* PS2 */
+    gpio-ps2 {
+        compatible = "gpio-keys";
+        ps2_dat: ps2-dat {
+            gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>;
+        };
+
+        ps2_cmd: ps2-cmd {
+            gpios = <&gpioc 12 GPIO_ACTIVE_HIGH>;
+        };
+
+        ps2_sel: ps2-sel {
+            gpios = <&gpiod 2 GPIO_ACTIVE_HIGH>;
+        };
+
+        ps2_clk: ps2-clk {
+            gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>;
+        };
     };
 };
 
-&pwm2 {
-    status = "okay";
+&pinctrl {
+    /* приявзка пинок к функциям энкодеров */
+    qdec_fl_pins: qdec-fl-pins {
+        pinmux = <STM32_PINMUX('B', 6, AF2)>, /*TIM4_CH1 */
+                 <STM32_PINMUX('B', 7, AF2)>; /*TIM4_CH2 */
+    };
+
+    qdec_fr_pins: qdec-fr-pins {
+        pinmux = <STM32_PINMUX('C', 6, AF2)>, /*TIM3_CH1 */
+                 <STM32_PINMUX('C', 7, AF2)>; /*TIM3_CH2 */
+    };
+
+    qdec_bl_pins: qdec-bl-pins {
+        pinmux = <STM32_PINMUX('A', 15, AF1)>, /*TIM2_CH1 */
+                 <STM32_PINMUX('B', 3, AF1)>; /*TIM2_CH2 */
+    };
+
+    qdec_br_pins: qdec-br-pins {
+        pinmux = <STM32_PINMUX('D', 12, AF2)>, /*TIM4_CH1 */
+                 <STM32_PINMUX('D', 13, AF2)>; /*TIM4_CH2 */
+    };
+
+    /* пины для ШИМ */
+    pwm_fl_pins: pwm-fl-pins {
+        pinmux = <STM32_PINMUX('E', 9, AF1)>; /*TIM1_CH1*/
+    };
+
+    pwm_fr_pins: pwm-fr-pins {
+        pinmux = <STM32_PINMUX('E', 13, AF1)>; /*TIM1_CH3*/
+    };
+
+    pwm_bl_pins: pwm-bl-pins {
+        pinmux = <STM32_PINMUX('A', 0, AF1)>; /*TIM2_CH1*/
+    };
+
+    pwm_br_pins: pwm-br-pins {
+        pinmux = <STM32_PINMUX('A', 7, AF14)>; /*TIM17_CH1*/
+    };
 };
 
 &tim1 {
     status = "okay";
+    pinctrl-0 = <&pwm_fl_pins &pwm_fr_pins>;
+    pinctrl-names = "default";
+    st,prescaler = <0>;
 };
 
 &tim2 {
     status = "okay";
+    pinctrl-0 = <&pwm_bl_pins>;
+    pinctrl-names = "default";
+    st,prescaler = <0>;
+};
+
+&tim17 {
+    status = "okay";
+    pinctrl-0 = <&pwm_br_pins>;
+    pinctrl-names = "default";
+    st,prescaler = <0>;
+};
+
+&tim2 {
+    status = "okay";
+    pinctrl-0 = <&qdec_bl_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
 };
 
 &tim3 {
     status = "okay";
+    pinctrl-0 = <&qdec_fr_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
 };
 
 &tim4 {
     status = "okay";
+    pinctrl-0 = <&qdec_fl_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
 };
 
-&pinctrl {
-    tim1_ch1_pa8: tim1_ch1_pa8 {
-        pinmux = <STM32_PINMUX('A', 8, AF1)>;
-    };
-    tim1_ch2_pa9: tim1_ch2_pa9 {
-        pinmux = <STM32_PINMUX('A', 9, AF1)>;
-    };
-    
-    tim2_ch1_pa0: tim2_ch1_pa0 {
-        pinmux = <STM32_PINMUX('A', 0, AF1)>;
-    };
-    tim2_ch2_pa1: tim2_ch2_pa1 {
-        pinmux = <STM32_PINMUX('A', 1, AF1)>;
-    };
-    
-    tim3_ch1_pb4: tim3_ch1_pb4 {
-        pinmux = <STM32_PINMUX('B', 4, AF2)>;
-    };
-    tim3_ch2_pb5: tim3_ch2_pb5 {
-        pinmux = <STM32_PINMUX('B', 5, AF2)>;
-    };
-    
-    tim4_ch1_pb6: tim4_ch1_pb6 {
-        pinmux = <STM32_PINMUX('B', 6, AF2)>;
-    };
-    tim4_ch2_pb7: tim4_ch2_pb7 {
-        pinmux = <STM32_PINMUX('B', 7, AF2)>;
-    };
+&tim5 {
+    status = "okay";
+    pinctrl-0 = <&qdec_br_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
 };
