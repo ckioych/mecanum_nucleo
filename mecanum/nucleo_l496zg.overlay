@@ -1,0 +1,119 @@
+/ {
+    pwm_motors {
+        compatible = "pwm_motors";
+        #address-cells = <1>';
+        #size-cells = <0>;
+
+        pwm_fl:pwm@0 {
+            compatible = "pwm_motors";
+            reg = <0>;
+            pwms = <&pwm2 2 PWM_MSEC(20)>, <&pwm2 3 PWM_MSEC(20)>;
+            status = "okay";
+        };
+
+        pwm_fr:pwm@1 {
+            compatible = "pwm_motors";
+            reg = <1>;
+            pwms = <&pwm2 4 PWM_MSEC(20)>, <&pwm2 5 PWM_MSEC(20)>;
+            status = "okay";
+        };
+
+        pwm_bl:pwm@2 {
+            compatible = "pwm_motors";
+            reg = <2>;
+            pwms = <&pwm2 6 PWM_MSEC(20)>, <&pwm2 7 PWM_MSEC(20)>;
+            status = "okay";
+        };
+
+        pwm_br:pwm@3 {
+            compatible = "pwm_motors";
+            reg = <3>;
+            pwms = <&pwm2 8 PWM_MSEC(20)>, <&pwm2 9 PWM_MSEC(20)>;
+            status = "okay";
+        };
+
+    };
+
+
+    qdec_fl:qdec_fl {
+        compatible = "st,stm32-qdec";
+        status = "okay";
+        pinctrl-0 = <&tim1_ch1_pa8 &tim1_ch2_pa9>;
+        pinctrl-names = "default";
+        st,autoload = <0xffffffff>;
+    };
+
+    qdec_fr:qdec_fr {
+        compatible = "st,stm32-qdec";
+        status = "okay";
+        pinctrl-0 = <&tim2_ch1_pa0 &tim2_ch2_pa1>;
+        pinctrl-names = "default";
+        st,autoload = <0xffffffff>;
+    };
+
+    qdec_bl:qdec_bl {
+        compatible = "st,stm32-qdec";
+        status = "okay";
+        pinctrl-0 = <&tim3_ch1_pb4 &tim3_ch2_pb5>;
+        pinctrl-names = "default";
+        st,autoload = <0xffffffff>;
+    };
+
+    qdec_br:qdec_br {
+        compatible = "st,stm32-qdec";
+        status = "okay";
+        pinctrl-0 = <&tim4_ch1_pb6 &tim4_ch2_pb7>;
+        pinctrl-names = "default";
+        st,autoload = <0xffffffff>;
+    };
+};
+
+&pwm2 {
+    status = "okay";
+};
+
+&tim1 {
+    status = "okay";
+};
+
+&tim2 {
+    status = "okay";
+};
+
+&tim3 {
+    status = "okay";
+};
+
+&tim4 {
+    status = "okay";
+};
+
+&pinctrl {
+    tim1_ch1_pa8: tim1_ch1_pa8 {
+        pinmux = <STM32_PINMUX('A', 8, AF1)>;
+    };
+    tim1_ch2_pa9: tim1_ch2_pa9 {
+        pinmux = <STM32_PINMUX('A', 9, AF1)>;
+    };
+    
+    tim2_ch1_pa0: tim2_ch1_pa0 {
+        pinmux = <STM32_PINMUX('A', 0, AF1)>;
+    };
+    tim2_ch2_pa1: tim2_ch2_pa1 {
+        pinmux = <STM32_PINMUX('A', 1, AF1)>;
+    };
+    
+    tim3_ch1_pb4: tim3_ch1_pb4 {
+        pinmux = <STM32_PINMUX('B', 4, AF2)>;
+    };
+    tim3_ch2_pb5: tim3_ch2_pb5 {
+        pinmux = <STM32_PINMUX('B', 5, AF2)>;
+    };
+    
+    tim4_ch1_pb6: tim4_ch1_pb6 {
+        pinmux = <STM32_PINMUX('B', 6, AF2)>;
+    };
+    tim4_ch2_pb7: tim4_ch2_pb7 {
+        pinmux = <STM32_PINMUX('B', 7, AF2)>;
+    };
+};
