@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex-Debug (JLink)",
+            "cwd": "${workspaceRoot}",
+            "executable": "/home/test/Desktop/projects/mecanum/build/zephyr/zephyr.elf",
+            "request": "launch",
+            "gdbPath": "/home/test/zephyr-sdk-0.17.4/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb",
+            "type": "cortex-debug",
+            "rtos": "Zephyr",
+            "servertype": "jlink",
+            "interface": "swd",
+            "device": "STM32L496ZG",
+            "showDevDebugOutput": "raw",
+            "runToEntryPoint": "main", 
+            //"preLaunchCommands": [
+            //    "set remote hardware-breakpoint-limit 6",
+            //    "set remote hardware-watchpoint-limit 4"
+            //],
+            "postLaunchCommands": [
+                "monitor reset",
+                "monitor halt"
+            ]
+        }
+    ]
+}

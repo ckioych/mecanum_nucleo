@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "CMake",
+            "compileCommands": "/home/test/Desktop/projects/mecanum/build/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compilerPath": "/usr/bin/g++"
+        },
+        {
+            "name": "STM32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "intelliSenseMode": "linux-gcc-arm",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
