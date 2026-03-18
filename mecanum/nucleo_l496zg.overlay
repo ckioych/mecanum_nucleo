@@ -10,7 +10,7 @@
         qdec-br = &qdec_br;
     };
 
-    /*описание моторов ШИМ */
+    // описание моторов ШИМ
     pwm_fl: pwm-fl {
         compatible = "pwm-leds"; //источник ШИМ сигнала
         pwm-fl-pwm {
@@ -39,7 +39,7 @@
         };
     };
 
-    /* GPIO для направления моторов */
+    // GPIO для направления моторов
     gpio-motor-dir {
         compatible = "gpio-leds";
         in_fl_a: in-fl-a {
@@ -82,7 +82,7 @@
         };
     };
 
-    /* энкодеры через QDEC */
+    // энкодеры через QDEC
     qdec_fl: qdec-fl {
         compatible = "st,stm32-qdec";
         pinctrl-0 = <&qdec_fl_pins>;
@@ -115,7 +115,7 @@
         status = "okay";
     };
 
-    /* PS2 */
+    // PS2
     gpio-ps2 {
         compatible = "gpio-keys";
         ps2_dat: ps2-dat {
@@ -127,17 +127,17 @@
         };
 
         ps2_sel: ps2-sel {
-            gpios = <&gpiod 2 GPIO_ACTIVE_HIGH>;
+            gpios = <&gpiod 10 GPIO_ACTIVE_HIGH>;
         };
 
         ps2_clk: ps2-clk {
-            gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>;
+            gpios = <&gpioc 8 GPIO_ACTIVE_HIGH>;
         };
     };
 };
 
 &pinctrl {
-    /* приявзка пинок к функциям энкодеров */
+    // приявзка пинов к функциям энкодеров
     qdec_fl_pins: qdec-fl-pins {
         pinmux = <STM32_PINMUX('B', 6, AF2)>, /*TIM4_CH1 */
                  <STM32_PINMUX('B', 7, AF2)>; /*TIM4_CH2 */
@@ -158,7 +158,7 @@
                  <STM32_PINMUX('D', 13, AF2)>; /*TIM4_CH2 */
     };
 
-    /* пины для ШИМ */
+    // пины для ШИМ
     pwm_fl_pins: pwm-fl-pins {
         pinmux = <STM32_PINMUX('E', 9, AF1)>; /*TIM1_CH1*/
     };
@@ -173,6 +173,14 @@
 
     pwm_br_pins: pwm-br-pins {
         pinmux = <STM32_PINMUX('A', 7, AF14)>; /*TIM17_CH1*/
+    };
+
+    ps2_pins: ps2-pins {
+        pinmux = <STM32_PINMUX('C', 8, GPIO)>, // ps2_clk
+                 <STM32_PINMUX('C', 10, GPIO)>, // ps2_sel
+                 <STM32_PINMUX('C', 11, GPIO)>, // ps2_dat
+                 <STM32_PINMUX('C', 12, GPIO)>, // ps2_cmd
+        bias-pull-up;
     };
 };
 

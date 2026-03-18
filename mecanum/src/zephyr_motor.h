@@ -10,81 +10,44 @@
 extern "C" {
 #endif
 
+// режимы работы моторов
 typedef enum {
-    DRIVER2WIRE,    
-    DRIVER2WIRE_NO_INVERT,
-    DRIVER2WIRE_PWM,
-    DRIVER3WIRE,
-    RELAY2WIRE,
-} GM_driverType;
+    MOTOR_STOP,
+    MOTOR_FORWARD,
+    MOTOR_BACKWARD,
+    MOTOR_BRAKE
+} motor_mode_t;
 
-typedef enum {
-    FORWARD,
-    BACKWARD,
-    BRAKE,
-    STOP
-} GM_workMode;
+typedef struct {
+    const struct device *pwm_dev;
+    uint32_t pwm_channel;
+    const struct device *gpio_dev;
+    gpio_pin_t pin_in1;
+    gpio_pin_t pin_in2;
 
-#define GM_NC 255
-
-struct GMotor {
-
-    GM_driverType type;
-
-    struct pwm_dt_spec pwm_a;
-    struct pwm_dt_spec pwm_b;
-    struct gpio_dt_spec dig_a;
-    struct gpio_dt_spec dig_b; 
-
+    bool reversed;
+    motor_mode_t last_mode;
     int8_t state;
-    int16_t duty;
-    int16_t target_duty;
-    
-    int16_t min_duty;
-    int16_t max_duty;
-    bool direction_reverse;
+
+    uint16_t min_duty;
+    uint16_t max_duty;
     uint16_t deadtime_us;
-    
-    bool smooth_enabled;
-    int16_t smooth_step;
-    struct k_timer smooth_timer;
-    uint32_t last_smooth_tick;
-    
-    GM_workMode current_mode;
-    GM_workMode last_mode;
-    
-    uint8_t resolution;
-};
+} zephyr_motor_t;
 
-void GMotor_init(struct GMotor *motor, GM_driverType type,
-                 const char *pwm_dev_name, uint32_t pwm_pin_a, uint32_t pwm_pin_b,
-                 bool active_high);
+void zephyr_motor_init(zephyr_motor_t *motor,
+                       const struct device *pwm_dev, uint32_t pwm_channel,
+                       const struct device *gpio_dev, gpio_pin_t in1, gpio_pin_t in2,
+                       bool reverse);
 
-void GMotor_setSpeed(struct GMotor *motor, int16_t dutu);
+void zephyr_motor_set_speed(zephyr_motor_t *motor, int16_t duty);
+void zephyr_motor_run(zephyr_motor_t *motor, motor_mode_t mode, int16_t duty);
+int8_t zephyr_motor_get_state(zephyr_motor_t *motor);
 
-void GMotor_run(struct GMotor *motor, GM_workMode mode, int16_t duty);
+void zephyr_motor_set_min_duty(zephyr_motor_t *motor, uint16_t duty);
+void zephyr_motor_set_max_duty(zephyr_motor_t *motor, uint16_t duty);
+void zephyr_motor_set_resolution(zephyr_motor_t *motor, uint8_t bits);
+void zephyr_motor_set_deadtime(zephyr_motor_t *motor, uint32_t us);
 
-void GMotor_stop(struct GMotor *motor);
-
-void GMotor_brake(struct GMotor *motor);
-
-void GMotor_setMinDuty(struct GMotor *motor, int16_t duty);
-
-void GMotor_setResolution(struct GMotor *motor, uint8_t bits);
-
-void GMotor_setDirection(struct GMotor *motor, bool reverse);
-
-void GMotor_setDeadtime(struct GMotor *motor, uint16_t us);
-
-void GMotor_enableSmooth(struct GMotor *motor, uint8_t step);
-
-void GMotor_disableSmooth(struct GMotor *motor);
-
-int8_t GMotor_getState(struct GMotor *motor);
-
-int16_t GMotor_getDuty(struct GMotor *motor);
-
-void GMotor_tick(struct GMotor *motor);
 
 #ifdef __cplusplus
 }
