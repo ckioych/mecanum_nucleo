@@ -30,7 +30,7 @@ static zephyr_encoder_t enc_fl, enc_fr, enc_bl, enc_br;
 // моторы accel
 static zephyr_accelmotor_t accel_fl, accel_fr, accel_bl, accel_br;
 
-// ps2
+// ps2 controller
 static ps2_t ps2;
 
 static bool position_mode = false;
