@@ -118,6 +118,7 @@
     // PS2
     gpio-ps2 {
         compatible = "gpio-keys";
+
         ps2_dat: ps2-dat {
             gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>;
         };
@@ -182,6 +183,12 @@
                  <STM32_PINMUX('C', 12, GPIO)>, // ps2_cmd
         bias-pull-up;
     };
+};
+
+&gpioc {
+    status = "okay";
+    pinctrl-0 = <&ps2_pins>;
+    pinctrl-names = "default";
 };
 
 &tim1 {

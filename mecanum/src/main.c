@@ -307,12 +307,18 @@ static void init_hardware(void) {
     accel_br.kd = PID_P;
 
     const struct device *gpio_dev_c = DEVICE_DR_GET(DT_NODELABEL(gpioc));
+
+    if (!device_is_ready(gpio_dev_c)) {
+        LOG_ERR("GPOIC device not ready");
+        return;
+    }
+
     const struct device *gpio_dev_d = DEVICE_DR_GET(DT_NODELABEL(gpiod));
 
-    if (!ps2_init(&ps2, gpio_dev_c, 10, 12, 2, 11, false, false)) {
+    if (!ps2_init(&ps2, gpio_dev_c, 8, 12, 10, 11, false, false)) {
         LOG_ERR("Failed to initialize PS2 controller");
     } else {
-        LOG_INF("PS2 controller initialized");
+        LOG_INF("PS2 controller initialized successfully on GPIOC");
     }
 
     LOG_INF("Hardware initialization complete");
