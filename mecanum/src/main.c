@@ -14,7 +14,7 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 #define PID_P 2.2f
 #define PID_I 0.4f
-#define PID_P 0.01f
+#define PID_D 0.01f
 
 #define PS2_DAT_PIN 11 // pc11
 #define PS2_CMD_PIN 12 //pc12
