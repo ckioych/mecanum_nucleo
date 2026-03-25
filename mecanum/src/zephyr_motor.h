@@ -3,10 +3,10 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <zephyr/drivers/pwm.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/pwm.h>
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -18,6 +18,7 @@ typedef enum {
     MOTOR_BRAKE
 } motor_mode_t;
 
+// структура моторов
 typedef struct {
     const struct device *pwm_dev;
     uint32_t pwm_channel;
@@ -31,26 +32,28 @@ typedef struct {
 
     uint16_t min_duty;
     uint16_t max_duty;
-    uint16_t deadtime_us;
+    uint32_t deadtime_us;
 } zephyr_motor_t;
 
+// инициализация
 void zephyr_motor_init(zephyr_motor_t *motor,
                        const struct device *pwm_dev, uint32_t pwm_channel,
                        const struct device *gpio_dev, gpio_pin_t in1, gpio_pin_t in2,
                        bool reverse);
 
+// основ. функции
 void zephyr_motor_set_speed(zephyr_motor_t *motor, int16_t duty);
 void zephyr_motor_run(zephyr_motor_t *motor, motor_mode_t mode, int16_t duty);
 int8_t zephyr_motor_get_state(zephyr_motor_t *motor);
 
+// настройки
 void zephyr_motor_set_min_duty(zephyr_motor_t *motor, uint16_t duty);
 void zephyr_motor_set_max_duty(zephyr_motor_t *motor, uint16_t duty);
 void zephyr_motor_set_resolution(zephyr_motor_t *motor, uint8_t bits);
 void zephyr_motor_set_deadtime(zephyr_motor_t *motor, uint32_t us);
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* ZEPHYR_MOTOR_H */
