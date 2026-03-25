@@ -1,6 +1,5 @@
 #include "zephyr_ps2.h"
 #include <zephyr/logging/log.h>
-#include <zephyr/sys/byteorder.h>
 
 LOG_MODULE_REGISTER(ps2, LOG_LEVEL_INF);
 
@@ -12,251 +11,262 @@ static const uint8_t exit_config[] = {0x01, 0x43, 0x00, 0x00, 0x5A, 0x5A, 0x5A, 
 static const uint8_t enable_rumble[] = {0x01, 0x4D, 0x00, 0x00, 0x01};
 static const uint8_t type_read[] = {0x01, 0x45, 0x00, 0x5A, 0x5A, 0x5A, 0x5A, 0x5A, 0x5A};
 
-PS2X::PS2X() : gpio_dev(nullptr), buttons(0), last_buttons(0), 
-               last_read(0), read_delay(1), controller_type(0),
-               en_Rumble(false), en_Pressures(false) {}
+// Задержки
+#define CTRL_CLK_DELAY     5
+#define CTRL_BYTE_DELAY    18
 
-bool PS2X::init(const struct device *dev, 
-                gpio_pin_t clk, gpio_pin_t cmd, 
-                gpio_pin_t att, gpio_pin_t dat,
-                bool pressures, bool rumble) {
-    
-    gpio_dev = dev;
-    clk_pin = clk;
-    cmd_pin = cmd;
-    att_pin = att;
-    dat_pin = dat;
-    
+// Низкоуровневые макросы
+#define CLK_SET(ps2)    gpio_pin_set((ps2)->gpio_dev, (ps2)->clk_pin, 1)
+#define CLK_CLR(ps2)    gpio_pin_set((ps2)->gpio_dev, (ps2)->clk_pin, 0)
+#define CMD_SET(ps2)    gpio_pin_set((ps2)->gpio_dev, (ps2)->cmd_pin, 1)
+#define CMD_CLR(ps2)    gpio_pin_set((ps2)->gpio_dev, (ps2)->cmd_pin, 0)
+#define ATT_SET(ps2)    gpio_pin_set((ps2)->gpio_dev, (ps2)->att_pin, 1)
+#define ATT_CLR(ps2)    gpio_pin_set((ps2)->gpio_dev, (ps2)->att_pin, 0)
+#define DAT_CHK(ps2)    (gpio_pin_get((ps2)->gpio_dev, (ps2)->dat_pin) > 0)
+
+static uint8_t gamepad_shiftinout(ps2_t *ps2, uint8_t data) {
+    uint8_t ret = 0;
+
+    for (int i = 0; i < 8; i++) {
+        if (data & (1 << i)) {
+            CMD_SET(ps2);
+        } else {
+            CMD_CLR(ps2);
+        }
+
+        CLK_CLR(ps2);
+        k_busy_wait(CTRL_CLK_DELAY);
+
+        if (DAT_CHK(ps2)) {
+            ret |= (1 << i);
+        }
+
+        CLK_SET(ps2);
+        k_busy_wait(CTRL_CLK_DELAY);
+    }
+
+    CMD_SET(ps2);
+    k_busy_wait(CTRL_BYTE_DELAY);
+
+    return ret;
+}
+
+static void send_command_string(ps2_t *ps2, const uint8_t *string, uint8_t len) {
+    ATT_CLR(ps2);
+    k_busy_wait(CTRL_BYTE_DELAY);
+
+    for (int i = 0; i < len; i++) {
+        gamepad_shiftinout(ps2, string[i]);
+    }
+
+    ATT_SET(ps2);
+    k_sleep(K_MSEC(ps2->read_delay));
+}
+
+bool ps2_init(ps2_t *ps2,
+              const struct device *gpio_dev,
+              gpio_pin_t clk_pin, gpio_pin_t cmd_pin,
+              gpio_pin_t att_pin, gpio_pin_t dat_pin,
+              bool pressures, bool rumble) {
+
+    ps2->gpio_dev = gpio_dev;
+    ps2->clk_pin = clk_pin;
+    ps2->cmd_pin = cmd_pin;
+    ps2->att_pin = att_pin;
+    ps2->dat_pin = dat_pin;
+    ps2->buttons = 0;
+    ps2->last_buttons = 0;
+    ps2->last_read = 0;
+    ps2->read_delay = 1;
+    ps2->controller_type = 0;
+    ps2->en_rumble = false;
+    ps2->en_pressures = false;
+
     if (!device_is_ready(gpio_dev)) {
         LOG_ERR("GPIO device not ready");
         return false;
     }
-    
-    // Настройка пинов
+
     gpio_pin_configure(gpio_dev, clk_pin, GPIO_OUTPUT);
     gpio_pin_configure(gpio_dev, cmd_pin, GPIO_OUTPUT);
     gpio_pin_configure(gpio_dev, att_pin, GPIO_OUTPUT);
     gpio_pin_configure(gpio_dev, dat_pin, GPIO_INPUT | GPIO_PULL_UP);
-    
-    // Установка начальных состояний
-    cmd_set();
-    clk_set();
-    att_set();
-    
-    // Первичное чтение для проверки связи
-    read_gamepad();
-    read_gamepad();
-    
-    // Проверка, отвечает ли контроллер
-    if (PS2data[1] != 0x41 && PS2data[1] != 0x42 && 
-        PS2data[1] != 0x73 && PS2data[1] != 0x79) {
-        LOG_ERR("No PS2 controller found. Response: 0x%02X", PS2data[1]);
+
+    CMD_SET(ps2);
+    CLK_SET(ps2);
+    ATT_SET(ps2);
+
+    // Первичное чтение
+    ps2_read_gamepad(ps2, false, 0);
+    ps2_read_gamepad(ps2, false, 0);
+
+    if (ps2->data[1] != 0x41 && ps2->data[1] != 0x42 &&
+        ps2->data[1] != 0x73 && ps2->data[1] != 0x79) {
+        LOG_ERR("No PS2 controller found. Response: 0x%02X", ps2->data[1]);
         return false;
     }
-    
-    // Конфигурация с увеличивающейся задержкой
-    read_delay = 1;
+
+    ps2->read_delay = 1;
     bool configured = false;
-    
+
     for (int y = 0; y <= 10; y++) {
-        sendCommandString((uint8_t*)enter_config, sizeof(enter_config));
-        
-        // Чтение типа
+        send_command_string(ps2, enter_config, sizeof(enter_config));
+
         k_busy_wait(CTRL_BYTE_DELAY);
-        cmd_set();
-        clk_set();
-        att_clr();
+        CMD_SET(ps2);
+        CLK_SET(ps2);
+        ATT_CLR(ps2);
         k_busy_wait(CTRL_BYTE_DELAY);
-        
+
         uint8_t temp[9];
         for (int i = 0; i < 9; i++) {
-            temp[i] = gamepad_shiftinout(type_read[i]);
+            temp[i] = gamepad_shiftinout(ps2, type_read[i]);
         }
-        att_set();
-        
-        controller_type = temp[3];
-        
-        sendCommandString((uint8_t*)set_mode, sizeof(set_mode));
-        
+        ATT_SET(ps2);
+
+        ps2->controller_type = temp[3];
+
+        send_command_string(ps2, set_mode, sizeof(set_mode));
+
         if (rumble) {
-            sendCommandString((uint8_t*)enable_rumble, sizeof(enable_rumble));
-            en_Rumble = true;
+            send_command_string(ps2, enable_rumble, sizeof(enable_rumble));
+            ps2->en_rumble = true;
         }
-        
+
         if (pressures) {
-            sendCommandString((uint8_t*)set_bytes_large, sizeof(set_bytes_large));
-            en_Pressures = true;
+            send_command_string(ps2, set_bytes_large, sizeof(set_bytes_large));
+            ps2->en_pressures = true;
         }
-        
-        sendCommandString((uint8_t*)exit_config, sizeof(exit_config));
-        
-        read_gamepad();
-        
+
+        send_command_string(ps2, exit_config, sizeof(exit_config));
+
+        ps2_read_gamepad(ps2, false, 0);
+
         if (pressures) {
-            if (PS2data[1] == 0x79) {
+            if (ps2->data[1] == 0x79) {
                 configured = true;
                 break;
             }
-            if (PS2data[1] == 0x73) {
+            if (ps2->data[1] == 0x73) {
                 LOG_ERR("Controller doesn't support pressures");
                 return false;
             }
         }
-        
-        if (PS2data[1] == 0x73) {
+
+        if (ps2->data[1] == 0x73) {
             configured = true;
             break;
         }
-        
-        read_delay++;
+
+        ps2->read_delay++;
         k_sleep(K_MSEC(1));
     }
-    
+
     if (!configured) {
         LOG_ERR("Failed to configure PS2 controller");
         return false;
     }
-    
-    LOG_INF("PS2 controller initialized. Type: 0x%02X", controller_type);
+
+    LOG_INF("PS2 controller initialized. Type: 0x%02X", ps2->controller_type);
     return true;
 }
 
-uint8_t PS2X::gamepad_shiftinout(uint8_t data) {
-    uint8_t ret = 0;
-    
-    for (int i = 0; i < 8; i++) {
-        // Установка бита команды
-        if (data & (1 << i)) {
-            cmd_set();
-        } else {
-            cmd_clr();
-        }
-        
-        // Тактовый импульс
-        clk_clr();
-        k_busy_wait(CTRL_CLK_DELAY);
-        
-        // Чтение бита данных
-        if (dat_chk()) {
-            ret |= (1 << i);
-        }
-        
-        clk_set();
-        k_busy_wait(CTRL_CLK_DELAY);
-    }
-    
-    cmd_set();
-    k_busy_wait(CTRL_BYTE_DELAY);
-    
-    return ret;
-}
-
-void PS2X::sendCommandString(uint8_t *string, uint8_t len) {
-    att_clr();
-    k_busy_wait(CTRL_BYTE_DELAY);
-    
-    for (int i = 0; i < len; i++) {
-        gamepad_shiftinout(string[i]);
-    }
-    
-    att_set();
-    k_sleep(K_MSEC(read_delay));
-}
-
-bool PS2X::read_gamepad(bool motor1, uint8_t motor2) {
+bool ps2_read_gamepad(ps2_t *ps2, bool motor1, uint8_t motor2) {
     uint64_t now = k_uptime_get();
-    
-    if (now - last_read > 1500) {
-        reconfig_gamepad();
+
+    if (now - ps2->last_read > 1500) {
+        ps2_reconfig(ps2);
     }
-    
-    if (now - last_read < read_delay) {
-        k_sleep(K_MSEC(read_delay - (now - last_read)));
+
+    if (now - ps2->last_read < ps2->read_delay) {
+        k_sleep(K_MSEC(ps2->read_delay - (now - ps2->last_read)));
     }
-    
+
     if (motor2 != 0) {
-        // Преобразование значения для вибромотора
         motor2 = (motor2 * 0xBF / 255) + 0x40;
     }
-    
+
     uint8_t dword[9] = {0x01, 0x42, 0, motor1 ? 0x01 : 0, motor2, 0, 0, 0, 0};
     uint8_t dword2[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    
-    // Несколько попыток чтения
+
     bool success = false;
     for (int retry = 0; retry < 5; retry++) {
-        cmd_set();
-        clk_set();
-        att_clr();
+        CMD_SET(ps2);
+        CLK_SET(ps2);
+        ATT_CLR(ps2);
         k_busy_wait(CTRL_BYTE_DELAY);
-        
+
         for (int i = 0; i < 9; i++) {
-            PS2data[i] = gamepad_shiftinout(dword[i]);
+            ps2->data[i] = gamepad_shiftinout(ps2, dword[i]);
         }
-        
-        if (PS2data[1] == 0x79) {
+
+        if (ps2->data[1] == 0x79) {
             for (int i = 0; i < 12; i++) {
-                PS2data[i + 9] = gamepad_shiftinout(dword2[i]);
+                ps2->data[i + 9] = gamepad_shiftinout(ps2, dword2[i]);
             }
         }
-        
-        att_set();
-        
-        if ((PS2data[1] & 0xF0) == 0x70) {
+
+        ATT_SET(ps2);
+
+        if ((ps2->data[1] & 0xF0) == 0x70) {
             success = true;
             break;
         }
-        
-        reconfig_gamepad();
-        k_sleep(K_MSEC(read_delay));
+
+        ps2_reconfig(ps2);
+        k_sleep(K_MSEC(ps2->read_delay));
     }
-    
-    last_buttons = buttons;
-    buttons = (uint16_t)(PS2data[4] << 8) | PS2data[3];
-    last_read = k_uptime_get();
-    
+
+    ps2->last_buttons = ps2->buttons;
+    ps2->buttons = (uint16_t)(ps2->data[4] << 8) | ps2->data[3];
+    ps2->last_read = k_uptime_get();
+
     return success;
 }
 
-bool PS2X::Button(uint16_t button) {
-    return (~buttons & button) != 0;
+bool ps2_button(ps2_t *ps2, uint16_t button) {
+    return (~ps2->buttons & button) != 0;
 }
 
-bool PS2X::ButtonPressed(uint16_t button) {
-    return NewButtonState(button) && Button(button);
+bool ps2_button_pressed(ps2_t *ps2, uint16_t button) {
+    return ps2_new_button_state_mask(ps2, button) && ps2_button(ps2, button);
 }
 
-bool PS2X::ButtonReleased(uint16_t button) {
-    return NewButtonState(button) && (~last_buttons & button) != 0;
+bool ps2_button_released(ps2_t *ps2, uint16_t button) {
+    return ps2_new_button_state_mask(ps2, button) &&
+           (~ps2->last_buttons & button) != 0;
 }
 
-bool PS2X::NewButtonState() {
-    return (last_buttons ^ buttons) != 0;
+bool ps2_new_button_state(ps2_t *ps2) {
+    return (ps2->last_buttons ^ ps2->buttons) != 0;
 }
 
-bool PS2X::NewButtonState(uint16_t button) {
-    return ((last_buttons ^ buttons) & button) != 0;
+bool ps2_new_button_state_mask(ps2_t *ps2, uint16_t button) {
+    return ((ps2->last_buttons ^ ps2->buttons) & button) != 0;
 }
 
-uint8_t PS2X::Analog(uint8_t button) {
-    return PS2data[button];
-}
-
-void PS2X::reconfig_gamepad() {
-    sendCommandString((uint8_t*)enter_config, sizeof(enter_config));
-    sendCommandString((uint8_t*)set_mode, sizeof(set_mode));
-    
-    if (en_Rumble) {
-        sendCommandString((uint8_t*)enable_rumble, sizeof(enable_rumble));
+uint8_t ps2_analog(ps2_t *ps2, uint8_t channel) {
+    if (channel < 21) {
+        return ps2->data[channel];
     }
-    
-    if (en_Pressures) {
-        sendCommandString((uint8_t*)set_bytes_large, sizeof(set_bytes_large));
-    }
-    
-    sendCommandString((uint8_t*)exit_config, sizeof(exit_config));
+    return 0;
 }
 
-uint8_t PS2X::readType() {
-    return controller_type;
+void ps2_reconfig(ps2_t *ps2) {
+    send_command_string(ps2, enter_config, sizeof(enter_config));
+    send_command_string(ps2, set_mode, sizeof(set_mode));
+
+    if (ps2->en_rumble) {
+        send_command_string(ps2, enable_rumble, sizeof(enable_rumble));
+    }
+
+    if (ps2->en_pressures) {
+        send_command_string(ps2, set_bytes_large, sizeof(set_bytes_large));
+    }
+
+    send_command_string(ps2, exit_config, sizeof(exit_config));
+}
+
+uint8_t ps2_read_type(ps2_t *ps2) {
+    return ps2->controller_type;
 }

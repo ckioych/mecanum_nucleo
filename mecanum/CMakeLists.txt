@@ -7,9 +7,9 @@ project(mecanum)
 target_sources(app PRIVATE
     src/main.c
     src/zephyr_motor.c
-    src/zephyr_accelmotor.c
     src/zephyr_encoder.c
-    src/zephyr_ps2.с
+    src/zephyr_accelmotor.c
+    src/zephyr_ps2.c
 )
 
 target_include_directories(app PRIVATE src)

@@ -13,24 +13,17 @@
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 // конфигурация
-#define MAX_SPEED 70    // макс. скорость в тиках/сек.
-#define MIN_DUTY 50    // минимальный ШИМ для трогания с места
-#define STEP_SIZE 50    // шаг перемещения по кнопкам
-#define ACCEL 7    // ускорение
-#define MAX_FOLLOW_SPEED 500    // макс. скорость
-#define DT_MS 20    // период дискретизации
+#define MAX_SPEED           70      // макс. скорость в тиках/сек
+#define MIN_DUTY            50      // минимальный ШИМ для трогания с места
+#define STEP_SIZE           50      // шаг перемещения по кнопкам
+#define ACCEL               7       // ускорение
+#define MAX_FOLLOW_SPEED    500     // макс. скорость слежения
+#define DT_MS               20      // период дискретизации
 
 // ПИД коэф-ты
-#define PID_P 2.2f
-#define PID_I 0.4f
-#define PID_D 0.01f
-
-
-// пины PS2
-#define PS2_DAT_PIN 11 // pc11
-#define PS2_CMD_PIN 12 //pc12
-#define PS2_SEL_PIN 10 //pc10
-#define PS2_CLK_PIN 8 //pc8
+#define PID_P   2.2f
+#define PID_I   0.4f
+#define PID_D   0.01f
 
 // моторы
 static zephyr_motor_t motor_fl, motor_fr, motor_bl, motor_br;
@@ -38,20 +31,20 @@ static zephyr_motor_t motor_fl, motor_fr, motor_bl, motor_br;
 // энкодеры
 static zephyr_encoder_t enc_fl, enc_fr, enc_bl, enc_br;
 
-// моторы accel
+// доп. функции моторов
 static zephyr_accelmotor_t accel_fl, accel_fr, accel_bl, accel_br;
 
-// ps2 controller
+// PS2 контроллер
 static ps2_t ps2;
 
-static bool position_mode = false; // false - speed mode, true - position mode
+// режим
+static bool position_mode = false;  // false - speed mode, true - position mode
 static int32_t pos_fl = 0, pos_fr = 0, pos_bl = 0, pos_br = 0;
 
 extern const struct device *tim1;
 extern const struct device *tim2;
 extern const struct device *tim3;
 extern const struct device *tim4;
-extern const struct device *tim5;
 extern const struct device *tim17;
 extern const struct device *gpiob;
 extern const struct device *gpioe;
@@ -77,6 +70,7 @@ static void change_mode(bool mode) {
         zephyr_accelmotor_set_run_mode(&accel_bl, ACCEL_POS);
         zephyr_accelmotor_set_run_mode(&accel_br, ACCEL_POS);
 
+        // Обновляем текущие позиции
         pos_fl = zephyr_accelmotor_get_current_pos(&accel_fl);
         pos_fr = zephyr_accelmotor_get_current_pos(&accel_fr);
         pos_bl = zephyr_accelmotor_get_current_pos(&accel_bl);
@@ -96,7 +90,6 @@ static void change_mode(bool mode) {
     }
 }
 
-
 // управление моторами
 void motor_control_thread(void *, void *, void *) {
     LOG_INF("Motor control thread started");
@@ -109,8 +102,8 @@ void motor_control_thread(void *, void *, void *) {
         int32_t enc_fr_val = zephyr_encoder_get_count(&enc_fr);
         int32_t enc_bl_val = zephyr_encoder_get_count(&enc_bl);
         int32_t enc_br_val = zephyr_encoder_get_count(&enc_br);
-        
-        // обновление моторов
+
+        // Обновление моторов
         bool moving1 = zephyr_accelmotor_tick(&accel_fl, enc_fl_val);
         bool moving2 = zephyr_accelmotor_tick(&accel_fr, enc_fr_val);
         bool moving3 = zephyr_accelmotor_tick(&accel_bl, enc_bl_val);
@@ -120,9 +113,9 @@ void motor_control_thread(void *, void *, void *) {
             LOG_INF("All motors stopped, switching to speed mode");
             change_mode(false);
         }
-        
-        //вывод отладочной информации
-        uint32_ now = k_uptime_get_32();
+
+        // вывод отладочной информации
+        uint32_t now = k_uptime_get_32();
         if (now - last_print > 1000) {
             last_print = now;
 
@@ -148,7 +141,6 @@ void motor_control_thread(void *, void *, void *) {
         k_sleep(K_MSEC(DT_MS));
     }
 }
-
 
 // PS2
 void ps2_thread(void *, void *, void *) {
@@ -207,7 +199,7 @@ void ps2_thread(void *, void *, void *) {
                 update_target_positions();
             }
 
-            // режим speed (стики)
+            // скоростной режим (стики)
             if (!position_mode) {
                 // чтение стиков и преобразование их в скорости
                 int val_lx = (int)ps2_analog(&ps2, PSS_LX) - 128;
@@ -231,7 +223,7 @@ void ps2_thread(void *, void *, void *) {
                 duty_br += val_ry - val_rx;
                 duty_bl += val_ry + val_rx;
 
-                //ограничение
+                // ограничение
                 if (duty_fr > MAX_SPEED) duty_fr = MAX_SPEED;
                 if (duty_fr < -MAX_SPEED) duty_fr = -MAX_SPEED;
                 if (duty_fl > MAX_SPEED) duty_fl = MAX_SPEED;
@@ -264,45 +256,60 @@ static void init_hardware(void) {
 
     const struct device *pwm_dev1 = DEVICE_DT_GET(DT_NODELABEL(tim1));
     const struct device *pwm_dev2 = DEVICE_DT_GET(DT_NODELABEL(tim2));
-    const struct device *pwm_dev5 = DEVICE_DT_GET(DT_NODELABEL(tim5));
     const struct device *pwm_dev17 = DEVICE_DT_GET(DT_NODELABEL(tim17));
-    const struct device *gpio_dev_b = DEVICE_DT_GET(DT_NODELABEL(gpiod));
+
+    const struct device *gpio_dev_b = DEVICE_DT_GET(DT_NODELABEL(gpiob));
     const struct device *gpio_dev_e = DEVICE_DT_GET(DT_NODELABEL(gpioe));
     const struct device *gpio_dev_a = DEVICE_DT_GET(DT_NODELABEL(gpioa));
     const struct device *gpio_dev_c = DEVICE_DT_GET(DT_NODELABEL(gpioc));
-    const struct device *gpio_dev_d = DEVICE_DT_GET(DT_NODELABEL(gpiod));
 
     const struct device *qdec_fl = DEVICE_DT_GET(DT_NODELABEL(qdec_fl));
     const struct device *qdec_fr = DEVICE_DT_GET(DT_NODELABEL(qdec_fr));
     const struct device *qdec_bl = DEVICE_DT_GET(DT_NODELABEL(qdec_bl));
     const struct device *qdec_br = DEVICE_DT_GET(DT_NODELABEL(qdec_br));
 
+    // проверка устройств
+    if (!device_is_ready(pwm_dev1)) LOG_ERR("TIM1 not ready");
+    if (!device_is_ready(pwm_dev2)) LOG_ERR("TIM2 not ready");
+    if (!device_is_ready(pwm_dev17)) LOG_ERR("TIM17 not ready");
+    if (!device_is_ready(gpio_dev_b)) LOG_ERR("GPIOB not ready");
+    if (!device_is_ready(gpio_dev_e)) LOG_ERR("GPIOE not ready");
+    if (!device_is_ready(gpio_dev_a)) LOG_ERR("GPIOA not ready");
+
+    // инициализация моторов
+    // FL мотор (PB13, PB14, TIM1_CH1/PE9)
     zephyr_motor_init(&motor_fl, pwm_dev1, 1, gpio_dev_b, 13, 14, false);
-    zephyr_motor_set_min_duty(*motor_fl, MIN_DUTY);
-    zephyr_motor_set_max_duty(*motor_fl, MAX_SPEED);
+    zephyr_motor_set_min_duty(&motor_fl, MIN_DUTY);
+    zephyr_motor_set_max_duty(&motor_fl, MAX_SPEED);
 
+    // FR мотор (PE10, PE11, TIM1_CH3/PE13)
     zephyr_motor_init(&motor_fr, pwm_dev1, 3, gpio_dev_e, 10, 11, false);
-    zephyr_motor_set_min_duty(*motor_fr, MIN_DUTY);
-    zephyr_motor_set_max_duty(*motor_fr, MAX_SPEED);
+    zephyr_motor_set_min_duty(&motor_fr, MIN_DUTY);
+    zephyr_motor_set_max_duty(&motor_fr, MAX_SPEED);
 
+    // BL мотор (PB8, PB9, TIM2_CH1/PA0)
     zephyr_motor_init(&motor_bl, pwm_dev2, 1, gpio_dev_b, 8, 9, false);
-    zephyr_motor_set_min_duty(*motor_bl, MIN_DUTY);
-    zephyr_motor_set_max_duty(*motor_bl, MAX_SPEED);
+    zephyr_motor_set_min_duty(&motor_bl, MIN_DUTY);
+    zephyr_motor_set_max_duty(&motor_bl, MAX_SPEED);
 
+    // BR мотор (PA5, PA6, TIM17_CH1/PA7)
     zephyr_motor_init(&motor_br, pwm_dev17, 1, gpio_dev_a, 5, 6, false);
-    zephyr_motor_set_min_duty(*motor_br, MIN_DUTY);
-    zephyr_motor_set_max_duty(*motor_br, MAX_SPEED);
+    zephyr_motor_set_min_duty(&motor_br, MIN_DUTY);
+    zephyr_motor_set_max_duty(&motor_br, MAX_SPEED);
 
+    // инициализация энкодеров
     zephyr_encoder_init(&enc_fl, qdec_fl);
     zephyr_encoder_init(&enc_fr, qdec_fr);
     zephyr_encoder_init(&enc_bl, qdec_bl);
     zephyr_encoder_init(&enc_br, qdec_br);
 
+    // инициализация доп. функций моторов
     zephyr_accelmotor_init(&accel_fl, &motor_fl, &enc_fl);
     zephyr_accelmotor_init(&accel_fr, &motor_fr, &enc_fr);
     zephyr_accelmotor_init(&accel_bl, &motor_bl, &enc_bl);
     zephyr_accelmotor_init(&accel_br, &motor_br, &enc_br);
 
+    // настройка параметров
     zephyr_accelmotor_set_dt(&accel_fl, DT_MS);
     zephyr_accelmotor_set_dt(&accel_fr, DT_MS);
     zephyr_accelmotor_set_dt(&accel_bl, DT_MS);
@@ -328,6 +335,7 @@ static void init_hardware(void) {
     zephyr_accelmotor_set_stopzone(&accel_bl, 5);
     zephyr_accelmotor_set_stopzone(&accel_br, 5);
 
+    // ПИД коэф-ты
     accel_fl.kp = PID_P;
     accel_fr.kp = PID_P;
     accel_bl.kp = PID_P;
@@ -338,34 +346,30 @@ static void init_hardware(void) {
     accel_bl.ki = PID_I;
     accel_br.ki = PID_I;
 
-    accel_fl.kd = PID_P;
-    accel_fr.kd = PID_P;
-    accel_bl.kd = PID_P;
-    accel_br.kd = PID_P;
+    accel_fl.kd = PID_D;
+    accel_fr.kd = PID_D;
+    accel_bl.kd = PID_D;
+    accel_br.kd = PID_D;
 
-    const struct device *gpio_dev_c = DEVICE_DR_GET(DT_NODELABEL(gpioc));
-
+    // инициализация PS2
     if (!device_is_ready(gpio_dev_c)) {
-        LOG_ERR("GPOIC device not ready");
-        return;
-    }
-
-    const struct device *gpio_dev_d = DEVICE_DR_GET(DT_NODELABEL(gpiod));
-
-    if (!ps2_init(&ps2, gpio_dev_c, 8, 12, 10, 11, false, false)) {
-        LOG_ERR("Failed to initialize PS2 controller");
+        LOG_ERR("GPIOC device not ready");
     } else {
-        LOG_INF("PS2 controller initialized successfully on GPIOC");
+        if (!ps2_init(&ps2, gpio_dev_c, 8, 12, 10, 11, false, false)) {
+            LOG_ERR("Failed to initialize PS2 controller");
+        } else {
+            LOG_INF("PS2 controller initialized successfully");
+        }
     }
 
     LOG_INF("Hardware initialization complete");
 }
 
 K_THREAD_DEFINE(motor_tid, 2048, motor_control_thread, NULL, NULL, NULL, 5, 0, 0);
-K_THREAD_DEFINE(PS2_tid, 2048, ps2_thread, NULL, NULL, NULL, 4, 0, 0);
+K_THREAD_DEFINE(ps2_tid, 2048, ps2_thread, NULL, NULL, NULL, 4, 0, 0);
 
 void main(void) {
-    LOG_INF("Starting Mecanum robot");
+    LOG_INF("Starting Mecanum robot on NUCLEO-L496ZG");
     init_hardware();
-    LOG_INF("System ready";)
+    LOG_INF("System ready");
 }

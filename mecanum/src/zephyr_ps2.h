@@ -5,6 +5,10 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Константы кнопок
 #define PSB_SELECT      0x0001
 #define PSB_L3          0x0002
@@ -29,68 +33,52 @@
 #define PSS_LX 7
 #define PSS_LY 8
 
-// Задержки (подобраны под STM32 80MHz)
-#define CTRL_CLK_DELAY     5  // микросекунд
-#define CTRL_BYTE_DELAY     18 // микросекунд
-
-class PS2X {
-public:
-    PS2X();
-    
-    // Инициализация с указанием устройств и пинов
-    bool init(const struct device *gpio_dev, 
-              gpio_pin_t clk_pin, gpio_pin_t cmd_pin, 
-              gpio_pin_t att_pin, gpio_pin_t dat_pin,
-              bool pressures = false, bool rumble = false);
-    
-    // Чтение состояния геймпада
-    bool read_gamepad(bool motor1 = false, uint8_t motor2 = 0);
-    
-    // Проверка кнопок
-    bool Button(uint16_t button);
-    bool ButtonPressed(uint16_t button);
-    bool ButtonReleased(uint16_t button);
-    bool NewButtonState();
-    bool NewButtonState(uint16_t button);
-    
-    // Аналоговые значения
-    uint8_t Analog(uint8_t button);
-    
-    // Переконфигурация
-    void reconfig_gamepad();
-    
-    // Тип контроллера
-    uint8_t readType();
-
-private:
-    // Низкоуровневые операции с GPIO
-    void clk_set() { gpio_pin_set(gpio_dev, clk_pin, 1); }
-    void clk_clr() { gpio_pin_set(gpio_dev, clk_pin, 0); }
-    void cmd_set() { gpio_pin_set(gpio_dev, cmd_pin, 1); }
-    void cmd_clr() { gpio_pin_set(gpio_dev, cmd_pin, 0); }
-    void att_set() { gpio_pin_set(gpio_dev, att_pin, 1); }
-    void att_clr() { gpio_pin_set(gpio_dev, att_pin, 0); }
-    bool dat_chk() { return gpio_pin_get(gpio_dev, dat_pin) > 0; }
-    
-    // Отправка/прием байта
-    uint8_t gamepad_shiftinout(uint8_t data);
-    
-    // Отправка командной строки
-    void sendCommandString(uint8_t *string, uint8_t len);
-    
-    // Устройства и пины
+// Структура PS2 контроллера
+typedef struct {
     const struct device *gpio_dev;
-    gpio_pin_t clk_pin, cmd_pin, att_pin, dat_pin;
-    
-    // Данные контроллера
-    uint8_t PS2data[21];
+    gpio_pin_t clk_pin;
+    gpio_pin_t cmd_pin;
+    gpio_pin_t att_pin;
+    gpio_pin_t dat_pin;
+
+    uint8_t data[21];
     uint16_t buttons;
     uint16_t last_buttons;
     uint64_t last_read;
     uint8_t read_delay;
     uint8_t controller_type;
-    bool en_Rumble;
-    bool en_Pressures;
-};
+    bool en_rumble;
+    bool en_pressures;
+} ps2_t;
 
+// Инициализация
+bool ps2_init(ps2_t *ps2,
+              const struct device *gpio_dev,
+              gpio_pin_t clk_pin, gpio_pin_t cmd_pin,
+              gpio_pin_t att_pin, gpio_pin_t dat_pin,
+              bool pressures, bool rumble);
+
+// Чтение состояния
+bool ps2_read_gamepad(ps2_t *ps2, bool motor1, uint8_t motor2);
+
+// Проверка кнопок
+bool ps2_button(ps2_t *ps2, uint16_t button);
+bool ps2_button_pressed(ps2_t *ps2, uint16_t button);
+bool ps2_button_released(ps2_t *ps2, uint16_t button);
+bool ps2_new_button_state(ps2_t *ps2);
+bool ps2_new_button_state_mask(ps2_t *ps2, uint16_t button);
+
+// Аналоговые значения
+uint8_t ps2_analog(ps2_t *ps2, uint8_t channel);
+
+// Переконфигурация
+void ps2_reconfig(ps2_t *ps2);
+
+// Тип контроллера
+uint8_t ps2_read_type(ps2_t *ps2);
+
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* ZEPHYR_PS2_H */

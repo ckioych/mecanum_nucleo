@@ -4,24 +4,28 @@
 #include "zephyr_motor.h"
 #include "zephyr_encoder.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     ACCEL_POS,      // позиционирование с ускорением
-    PID_POS,        // ПИД-позиционирование
+    PID_POS,        // ПИД позиционирование
     ACCEL_SPEED,    // скорость с ускорением
-    PID_SPEED,      // ПИД-скорость
+    PID_SPEED,      // ПИД скорость
     IDLE_RUN
 } accel_run_mode_t;
 
 typedef struct {
     zephyr_motor_t *motor;
-    zephyur_encoder_t *encoder;
+    zephyr_encoder_t *encoder;
 
-    float ratio;           // передаточное число
-    uint32_t dt_ms;        // период (мс)
-    float dt_sec;          // пероид (сек)
-    uint32_t stopzone;     // зона остановки
-    uint16_ max_speed;     // макс. скорость
-    float accelerarion;    // ускорение
+    float ratio;            // передаточное число
+    uint32_t dt_ms;         // период (мс)
+    float dt_sec;           // период (сек)
+    uint32_t stopzone;      // зона остановки
+    uint16_t max_speed;     // макс. скорость
+    float acceleration;     // ускорение
 
     accel_run_mode_t run_mode;
     int32_t current_pos;
@@ -43,21 +47,23 @@ typedef struct {
 
     float control_pos;
     float control_speed;
-} zephyr_accelmotor_c;
+} zephyr_accelmotor_t;
 
+// инициализация
 void zephyr_accelmotor_init(zephyr_accelmotor_t *accel,
                             zephyr_motor_t *motor,
                             zephyr_encoder_t *encoder);
 
 bool zephyr_accelmotor_tick(zephyr_accelmotor_t *accel, int32_t pos);
 
+// настройки
 void zephyr_accelmotor_set_dt(zephyr_accelmotor_t *accel, uint32_t dt_ms);
 void zephyr_accelmotor_set_ratio(zephyr_accelmotor_t *accel, float ratio);
 void zephyr_accelmotor_set_stopzone(zephyr_accelmotor_t *accel, uint32_t zone);
 void zephyr_accelmotor_set_run_mode(zephyr_accelmotor_t *accel, accel_run_mode_t mode);
 accel_run_mode_t zephyr_accelmotor_get_run_mode(zephyr_accelmotor_t *accel);
 
-void zephyr_accelmotor_set_target_pos(zephyr_accelmotor_t *accel int32_pos);
+void zephyr_accelmotor_set_target_pos(zephyr_accelmotor_t *accel, int32_t pos);
 void zephyr_accelmotor_set_target_pos_deg(zephyr_accelmotor_t *accel, int32_t deg);
 int32_t zephyr_accelmotor_get_target_pos(zephyr_accelmotor_t *accel);
 int32_t zephyr_accelmotor_get_target_pos_deg(zephyr_accelmotor_t *accel);
@@ -67,12 +73,14 @@ void zephyr_accelmotor_set_target_speed_deg(zephyr_accelmotor_t *accel, int16_t 
 int16_t zephyr_accelmotor_get_target_speed(zephyr_accelmotor_t *accel);
 int16_t zephyr_accelmotor_get_target_speed_deg(zephyr_accelmotor_t *accel);
 
+// текущее состояние
 int32_t zephyr_accelmotor_get_current_pos(zephyr_accelmotor_t *accel);
 int32_t zephyr_accelmotor_get_current_pos_deg(zephyr_accelmotor_t *accel);
 int16_t zephyr_accelmotor_get_current_speed(zephyr_accelmotor_t *accel);
 int16_t zephyr_accelmotor_get_current_speed_deg(zephyr_accelmotor_t *accel);
 float zephyr_accelmotor_get_duty(zephyr_accelmotor_t *accel);
 
+// ограничения
 void zephyr_accelmotor_set_max_speed(zephyr_accelmotor_t *accel, uint16_t speed);
 void zephyr_accelmotor_set_max_speed_deg(zephyr_accelmotor_t *accel, uint16_t speed);
 void zephyr_accelmotor_set_acceleration(zephyr_accelmotor_t *accel, float accel_val);
@@ -80,4 +88,8 @@ void zephyr_accelmotor_set_acceleration_deg(zephyr_accelmotor_t *accel, float ac
 
 bool zephyr_accelmotor_is_blocked(zephyr_accelmotor_t *accel);
 
-#endif // ZEPHYR_ACCELMOTOR_H
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ZEPHYR_ACCELMOTOR_H */
