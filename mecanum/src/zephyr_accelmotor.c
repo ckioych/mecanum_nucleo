@@ -141,6 +141,8 @@ bool zephyr_accelmotor_tick(zephyr_accelmotor_t *accel, int32_t pos) {
         accel->current_speed = filter_speed(accel, accel->current_speed);
         accel->last_pos = accel->current_pos;
 
+        zephyr_encoder_set_direction(accel->encoder, (accel->current_speed > 0) ? 1 : ((accel->current_speed < 0) ? -1 : 0));
+        
         switch (accel->run_mode) {
             case ACCEL_POS: {
                 float err = (float)(accel->target_pos - accel->control_pos);

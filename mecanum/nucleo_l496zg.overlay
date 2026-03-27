@@ -97,24 +97,12 @@
 
 &pinctrl {
     // энкодеры
-    qdec_fl_pins: qdec-fl-pins {
-        pinmux = <STM32_PINMUX('B', 6, AF2)>,  // TIM4_CH1
-                 <STM32_PINMUX('B', 7, AF2)>;  // TIM4_CH2
-    };
-
-    qdec_fr_pins: qdec-fr-pins {
-        pinmux = <STM32_PINMUX('C', 6, AF2)>,  // TIM3_CH1
-                 <STM32_PINMUX('C', 7, AF2)>;  // TIM3_CH2
-    };
-
-    qdec_bl_pins: qdec-bl-pins {
-        pinmux = <STM32_PINMUX('A', 15, AF1)>, // TIM2_CH1
-                 <STM32_PINMUX('B', 3, AF1)>;  // TIM2_CH2
-    };
-
-    qdec_br_pins: qdec-br-pins {
-        pinmux = <STM32_PINMUX('D', 12, AF2)>, // TIM4_CH1
-                 <STM32_PINMUX('D', 13, AF2)>; // TIM4_CH2
+    encoder_pins: encoder-pins {
+        pinmux = <STM32_PINMUX('B', 6, GPIO)>,
+                 <STM32_PINMUX('C', 6, GPIO)>,
+                 <STM32_PINMUX('A', 15, GPIO)>,
+                 <STM32_PINMUX('D', 12, GPIO)>;
+        bias-pull-up;
     };
 
     // ШИМ
@@ -156,31 +144,32 @@
     };
 };
 
+// настройка пинов для энкодеров
 &gpiob {
     status = "okay";
-    pinctrl-0 = <&motor_dir_pins>;
-    pinctrl-names = "default";
-};
-
-&gpioe {
-    status = "okay";
-    pinctrl-0 = <&motor_dir_pins>;
-    pinctrl-names = "default";
-};
-
-&gpioa {
-    status = "okay";
-    pinctrl-0 = <&motor_dir_pins>;
+    pinctrl-0 = <&encoder_pins &motor_dir_pins>;
     pinctrl-names = "default";
 };
 
 &gpioc {
     status = "okay";
-    pinctrl-0 = <&ps2_pins>;
+    pinctrl-0 = <&encoder_pins &ps2_pins>;
     pinctrl-names = "default";
 };
 
-// таймеры
+&gpioa {
+    status = "okay";
+    pinctrl-0 = <&encoder_pins &motor_dir_pins>;
+    pinctrl-names = "default";
+};
+
+&gpiod {
+    status = "okay";
+    pinctrl-0 = <&encoder_pins>;
+    pinctrl-names = "default";
+};
+
+// Таймеры для ШИМ
 &tim1 {
     status = "okay";
     pinctrl-0 = <&pwm_fl_pins &pwm_fr_pins>;
@@ -190,24 +179,9 @@
 
 &tim2 {
     status = "okay";
-    pinctrl-0 = <&pwm_bl_pins &qdec_bl_pins>;
+    pinctrl-0 = <&pwm_bl_pins>;
     pinctrl-names = "default";
     st,prescaler = <0>;
-    st,encoder-mode = <2>;
-};
-
-&tim3 {
-    status = "okay";
-    pinctrl-0 = <&qdec_fr_pins>;
-    pinctrl-names = "default";
-    st,encoder-mode = <2>;
-};
-
-&tim4 {
-    status = "okay";
-    pinctrl-0 = <&qdec_fl_pins &qdec_br_pins>;
-    pinctrl-names = "default";
-    st,encoder-mode = <2>;
 };
 
 &tim17 {
