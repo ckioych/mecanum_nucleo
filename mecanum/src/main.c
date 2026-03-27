@@ -262,6 +262,7 @@ static void init_hardware(void) {
     const struct device *gpio_dev_e = DEVICE_DT_GET(DT_NODELABEL(gpioe));
     const struct device *gpio_dev_a = DEVICE_DT_GET(DT_NODELABEL(gpioa));
     const struct device *gpio_dev_c = DEVICE_DT_GET(DT_NODELABEL(gpioc));
+    const struct device *gpio_dev_d = DEVICE_DT_GET(DT_NODELABEL(gpiod));
 
     const struct device *qdec_fl = DEVICE_DT_GET(DT_NODELABEL(qdec_fl));
     const struct device *qdec_fr = DEVICE_DT_GET(DT_NODELABEL(qdec_fr));
@@ -301,12 +302,13 @@ static void init_hardware(void) {
     const struct device *gpio_dev_b = DEVICE_DT_GET(DT_NODELABEL(gpiob));
     const struct device *gpio_dev_c = DEVICE_DT_GET(DT_NODELABEL(gpioc));
     const struct device *gpio_dev_a = DEVICE_DT_GET(DT_NODELABEL(gpioa));
+    const struct device *gpio_dev_e = DEVICE_DT_GET(DT_NODELABEL(gpioe));
     const struct device *gpio_dev_d = DEVICE_DT_GET(DT_NODELABEL(gpiod));
     
     zephyr_encoder_init(&enc_fl, gpio_dev_b, 6);
     zephyr_encoder_init(&enc_fr, gpio_dev_c, 6);
-    zephyr_encoder_init(&enc_bl, gpio_dev_a, 15);
-    zephyr_encoder_init(&enc_br, gpio_dev_d, 12);
+    zephyr_encoder_init(&enc_bl, gpio_dev_a, 8);
+    zephyr_encoder_init(&enc_br, gpio_dev_d, 3);
 
     // инициализация доп. функций моторов
     zephyr_accelmotor_init(&accel_fl, &motor_fl, &enc_fl);
