@@ -100,7 +100,7 @@
     encoder_pins: encoder-pins {
         pinmux = <STM32_PINMUX('B', 6, GPIO)>,
                  <STM32_PINMUX('C', 6, GPIO)>,
-                 <STM32_PINMUX('B', 8, GPIO)>,
+                 <STM32_PINMUX('E', 8, GPIO)>,
                  <STM32_PINMUX('D', 3, GPIO)>;
         bias-pull-up;
     };

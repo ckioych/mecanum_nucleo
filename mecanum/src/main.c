@@ -297,17 +297,10 @@ static void init_hardware(void) {
     zephyr_motor_init(&motor_br, pwm_dev17, 1, gpio_dev_a, 5, 6, false);
     zephyr_motor_set_min_duty(&motor_br, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_br, MAX_SPEED);
-
-    // инициализация энкодеров
-    const struct device *gpio_dev_b = DEVICE_DT_GET(DT_NODELABEL(gpiob));
-    const struct device *gpio_dev_c = DEVICE_DT_GET(DT_NODELABEL(gpioc));
-    const struct device *gpio_dev_a = DEVICE_DT_GET(DT_NODELABEL(gpioa));
-    const struct device *gpio_dev_e = DEVICE_DT_GET(DT_NODELABEL(gpioe));
-    const struct device *gpio_dev_d = DEVICE_DT_GET(DT_NODELABEL(gpiod));
     
     zephyr_encoder_init(&enc_fl, gpio_dev_b, 6);
     zephyr_encoder_init(&enc_fr, gpio_dev_c, 6);
-    zephyr_encoder_init(&enc_bl, gpio_dev_a, 8);
+    zephyr_encoder_init(&enc_bl, gpio_dev_e, 8);
     zephyr_encoder_init(&enc_br, gpio_dev_d, 3);
 
     // инициализация доп. функций моторов
