@@ -14,28 +14,28 @@
     pwm_fl: pwm-fl {
         compatible = "pwm-leds";
         pwm-fl-pwm {
-            pwms = <&tim1 1 1000 PWM_POLARITY_NORMAL>; // TIM1_CH1
+            pwms = <&timers1 1 1000 PWM_POLARITY_NORMAL>; // TIM1_CH1
         };
     };
 
     pwm_fr: pwm-fr {
         compatible = "pwm-leds";
         pwm-fr-pwm {
-            pwms = <&tim1 3 1000 PWM_POLARITY_NORMAL>;
+            pwms = <&timers1 3 1000 PWM_POLARITY_NORMAL>;
         };
     };
 
     pwm_bl: pwm-bl {
         compatible = "pwm-leds";
         pwm-bl-pwm {
-            pwms = <&tim2 1 1000 PWM_POLARITY_NORMAL>; // TIM2_CH1
+            pwms = <&timers2 1 1000 PWM_POLARITY_NORMAL>; // TIM2_CH1
         };
     };
 
     pwm_br: pwm-br {
         compatible = "pwm-leds";
         pwm-br-pwm {
-            pwms = <&tim17 1 1000 PWM_POLARITY_NORMAL>; // TIM17_CH1
+            pwms = <&timers17 1 1000 PWM_POLARITY_NORMAL>; // TIM17_CH1
         };
     };
 
@@ -96,50 +96,124 @@
 };
 
 &pinctrl {
-    // энкодеры
-    encoder_pins: encoder-pins {
-        pinmux = <STM32_PINMUX('B', 6, GPIO)>,
-                 <STM32_PINMUX('C', 6, GPIO)>,
-                 <STM32_PINMUX('E', 8, GPIO)>,
-                 <STM32_PINMUX('D', 3, GPIO)>;
+    // Энкодеры
+    encoder_pins: encoder_pins {
+        group1 { pinmux = <0x361>; bias-pull-up; };  // PB6 (D71) - FL
+        group2 { pinmux = <0x461>; bias-pull-up; };  // PC6 (D16) - FR
+        group3 { pinmux = <0x4a1>; bias-pull-up; };  // PE8 (D42) - BL
+        group4 { pinmux = <0x6c1>; bias-pull-up; };  // PD3 (D55) - BR
+    };
+
+    // Направление моторов
+    motor_dir_pins: motor_dir_pins {
+        group1 { pinmux = <0x3d1>; };  // PB13 (IN1 FL)
+        group2 { pinmux = <0x3e1>; };  // PB14 (IN2 FL)
+        group3 { pinmux = <0x4a1>; };  // PE10 (IN1 FR)
+        group4 { pinmux = <0x4b1>; };  // PE11 (IN2 FR)
+        group5 { pinmux = <0x381>; };  // PB8 (IN1 BL)
+        group6 { pinmux = <0x391>; };  // PB9 (IN2 BL)
+        group7 { pinmux = <0x151>; };  // PA5 (IN1 BR)
+        group8 { pinmux = <0x161>; };  // PA6 (IN2 BR)
+    };
+
+    // PS2 геймпад
+    ps2_pins: ps2_pins {
+        group1 { pinmux = <0x481>; bias-pull-up; };  // PC8 (CLK)
+        group2 { pinmux = <0x4a1>; bias-pull-up; };  // PC10 (SEL)
+        group3 { pinmux = <0x4b1>; bias-pull-up; };  // PC11 (DAT)
+        group4 { pinmux = <0x4c1>; bias-pull-up; };  // PC12 (CMD)
+    };
+
+    // ШИМ
+    tim1_ch1_pe9: tim1_ch1_pe9 {
+        pinmux = <0x9a1>;  // TIM1_CH1 (PE9) - PWM FL
+    };
+    tim1_ch3_pe13: tim1_ch3_pe13 {
+        pinmux = <0x9a1>;  // TIM1_CH3 (PE13) - PWM FR
+    };
+    tim2_ch1_pa0: tim2_ch1_pa0 {
+        pinmux = <0x101>;  // TIM2_CH1 (PA0) - PWM BL
+    };
+    tim17_ch1_pa7: tim17_ch1_pa7 {
+        pinmux = <0x171>;  // TIM17_CH1 (PA7) - PWM BR
+    };
+
+    // QDEC
+    // Энкодер FL (таймер TIM4, каналы CH1 и CH2)
+    tim4_ch1_pb6_qdec: tim4_ch1_pb6_qdec {
+        pinmux = <0x362>;
+        bias-pull-up;
+    };
+    tim4_ch2_pb7_qdec: tim4_ch2_pb7_qdec {
+        pinmux = <0x372>;
+        bias-pull-up;
+    };
+
+    // Энкодер FR (таймер TIM3, каналы CH1 и CH2)
+    tim3_ch1_pc6_qdec: tim3_ch1_pc6_qdec {
+        pinmux = <0x462>;
+        bias-pull-up;
+    };
+    tim3_ch2_pc7_qdec: tim3_ch2_pc7_qdec {
+        pinmux = <0x472>;
+        bias-pull-up;
+    };
+
+    // Энкодер BL (таймер TIM2, каналы CH1 и CH2)
+    tim2_ch1_pa15_qdec: tim2_ch1_pa15_qdec {
+        pinmux = <0x1f1>;
+        bias-pull-up;
+    };
+    tim2_ch2_pb3_qdec: tim2_ch2_pb3_qdec {
+        pinmux = <0x231>;
+        bias-pull-up;
+    };
+
+    // Энкодер BR (таймер TIM4, каналы CH1 и CH2)
+    tim4_ch1_pd12_qdec: tim4_ch1_pd12_qdec {
+        pinmux = <0x6c2>;
+        bias-pull-up;
+    };
+    tim4_ch2_pd13_qdec: tim4_ch2_pd13_qdec {
+        pinmux = <0x6d2>;
         bias-pull-up;
     };
 
     // ШИМ
-    pwm_fl_pins: pwm-fl-pins {
-        pinmux = <STM32_PINMUX('E', 9, AF1)>;  // TIM1_CH1
+    pwm_fl_pins: pwm_fl_pins {
+        pinmux = <0x9a1>;  // TIM1_CH1 — PWM для FL
+    };
+    pwm_fr_pins: pwm_fr_pins {
+        pinmux = <0x9a1>; // TIM1_CH3 — PWM для FR
+    };
+    pwm_bl_pins: pwm_bl_pins {
+        pinmux = <0x101>;  // TIM2_CH1 — PWM для BL
+    };
+    pwm_br_pins: pwm_br_pins {
+        pinmux = <0x171>; // TIM17_CH1 — PWM для BR
     };
 
-    pwm_fr_pins: pwm-fr-pins {
-        pinmux = <STM32_PINMUX('E', 13, AF1)>; // TIM1_CH3
+    // Энкодер BL (таймер TIM2, каналы CH1 и CH2)
+    qdec_bl_pins: qdec_bl_pins {
+        pinmux = <0x1f1 0x231>;  // PA15 (AF1) и PB3 (AF1)
+        bias-pull-up;
     };
 
-    pwm_bl_pins: pwm-bl-pins {
-        pinmux = <STM32_PINMUX('A', 0, AF1)>;  // TIM2_CH1
+    // Энкодер FR (таймер TIM3, каналы CH1 и CH2)
+    qdec_fr_pins: qdec_fr_pins {
+        pinmux = <0x462 0x472>;  // PC6 (AF2) и PC7 (AF2)
+        bias-pull-up;
     };
 
-    pwm_br_pins: pwm-br-pins {
-        pinmux = <STM32_PINMUX('A', 7, AF14)>; // TIM17_CH1
+    // Энкодер FL (таймер TIM4, каналы CH1 и CH2)
+    qdec_fl_pins: qdec_fl_pins {
+        pinmux = <0x362 0x372>;  // PB6 (AF2) и PB7 (AF2)
+        bias-pull-up;
     };
 
-    // пины направления моторов
-    motor_dir_pins: motor-dir-pins {
-        pinmux = <STM32_PINMUX('B', 13, GPIO)>,
-                 <STM32_PINMUX('B', 14, GPIO)>,
-                 <STM32_PINMUX('E', 10, GPIO)>,
-                 <STM32_PINMUX('E', 11, GPIO)>,
-                 <STM32_PINMUX('B', 8, GPIO)>,
-                 <STM32_PINMUX('B', 9, GPIO)>,
-                 <STM32_PINMUX('A', 5, GPIO)>,
-                 <STM32_PINMUX('A', 6, GPIO)>;
-    };
-
-    // PS2 пины
-    ps2_pins: ps2-pins {
-        pinmux = <STM32_PINMUX('C', 8, GPIO)>,  // CLK
-                 <STM32_PINMUX('C', 10, GPIO)>, // SEL
-                 <STM32_PINMUX('C', 11, GPIO)>, // DAT
-                 <STM32_PINMUX('C', 12, GPIO)>; // CMD
+    // Энкодер BR (таймер TIM4, каналы CH1 и CH2)
+    qdec_br_pins: qdec_br_pins {
+        pinmux = <0x6c2 0x6d2>;  // PD12 (AF2) и PD13 (AF2)
         bias-pull-up;
     };
 };
@@ -170,23 +244,46 @@
 };
 
 // Таймеры для ШИМ
-&tim1 {
+&timers1 {
     status = "okay";
     pinctrl-0 = <&pwm_fl_pins &pwm_fr_pins>;
     pinctrl-names = "default";
     st,prescaler = <0>;
 };
 
-&tim2 {
+&timers2 {
     status = "okay";
     pinctrl-0 = <&pwm_bl_pins>;
     pinctrl-names = "default";
     st,prescaler = <0>;
 };
 
-&tim17 {
+&timers17 {
     status = "okay";
     pinctrl-0 = <&pwm_br_pins>;
     pinctrl-names = "default";
     st,prescaler = <0>;
+};
+
+&timers4 {
+    status = "okay";
+    pinctrl-0 = <&qdec_fl_pins &qdec_br_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
+};
+
+// Таймер TIM3 (обслуживает энкодер FR)
+&timers3 {
+    status = "okay";
+    pinctrl-0 = <&qdec_fr_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
+};
+
+// Таймер TIM2 (обслуживает энкодер BL)
+&timers2 {
+    status = "okay";
+    pinctrl-0 = <&qdec_bl_pins>;
+    pinctrl-names = "default";
+    st,encoder-mode = <2>;
 };
