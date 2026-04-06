@@ -1,0 +1,2 @@
+ccache /home/test/zephyr-sdk-0.17.4/arm-zephyr-eabi/bin/arm-zephyr-eabi-ar qc libdrivers__serial.a CMakeFiles/drivers__serial.dir/uart_stm32.c.obj
+ccache /home/test/zephyr-sdk-0.17.4/arm-zephyr-eabi/bin/arm-zephyr-eabi-ranlib libdrivers__serial.a

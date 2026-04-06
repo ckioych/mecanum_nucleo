@@ -1,8 +1,15 @@
 #include "zephyr_accelmotor.h"
-#include <math.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(accelmotor, LOG_LEVEL_INF);
+
+static int32_t iabs32(int32_t x) {
+    return (x < 0) ? -x : x;
+}
+
+static float fabs32(float x) {
+    return (x < 0.0f) ? -x : x;
+}
 
 static int8_t sign(float x) {
     return (x > 0) ? 1 : ((x < 0) ? -1 : 0);
@@ -108,7 +115,7 @@ static void pid_control(zephyr_accelmotor_t *accel, int32_t target, int32_t curr
     uint16_t min_duty = 0;
 
     if (cutoff) {
-        if (abs(err) > (int32_t)accel->stopzone) {
+        if (iabs32(err) > (int32_t)accel->stopzone) {
             accel->duty_f += sign(err) * min_duty;
         } else {
             accel->integral = 0.0f;
@@ -141,25 +148,28 @@ bool zephyr_accelmotor_tick(zephyr_accelmotor_t *accel, int32_t pos) {
         accel->current_speed = filter_speed(accel, accel->current_speed);
         accel->last_pos = accel->current_pos;
 
-        zephyr_encoder_set_direction(accel->encoder, (accel->current_speed > 0) ? 1 : ((accel->current_speed < 0) ? -1 : 0));
+        int8_t motor_dir = zephyr_motor_get_state(accel->motor);
+        if (motor_dir != 0) {
+            zephyr_encoder_set_direction(accel->encoder, motor_dir);
+        }
         
         switch (accel->run_mode) {
             case ACCEL_POS: {
                 float err = (float)(accel->target_pos - accel->control_pos);
 
-                if (fabs(err) > 0.1f) {
+                if (fabs32(err) > 0.1f) {
                     float accel_step = accel->acceleration * accel->dt_sec;
 
-                    if (fabs(err) < accel->stopzone &&
-                        fabs(accel->last_speed - accel->control_speed) < 2.0f) {
+                    if (fabs32(err) < accel->stopzone &&
+                        fabs32(accel->last_speed - accel->control_speed) < 2.0f) {
                         accel->control_pos = (float)accel->target_pos;
                         accel->control_speed = 0.0f;
                         accel_step = 0.0f;
                     }
 
-                    if (fabs(err) < (accel->control_speed * accel->control_speed) / (2.0f * accel->acceleration)) {
+                    if (fabs32(err) < (accel->control_speed * accel->control_speed) / (2.0f * accel->acceleration)) {
                         err = -err;
-                        accel_step = (accel->control_speed * accel->control_speed) / (2.0f * fabs(err));
+                        accel_step = (accel->control_speed * accel->control_speed) / (2.0f * fabs32(err));
                         if (sign(accel->control_speed) == sign(err)) err = -err;
                     }
 
@@ -185,7 +195,7 @@ bool zephyr_accelmotor_tick(zephyr_accelmotor_t *accel, int32_t pos) {
 
             case ACCEL_SPEED: {
                 int16_t err = accel->target_speed - accel->current_speed;
-                float reducer = (fabs(err) < accel->acceleration) ? 1.0f : fabs(err) / accel->acceleration;
+                float reducer = (fabs32((float)err) < accel->acceleration) ? 1.0f : fabs32((float)err) / accel->acceleration;
                 accel->duty_f += (float)sign(err) * accel->acceleration * accel->dt_sec * reducer;
                 if (accel->max_speed > 0) {
                     if (accel->duty_f > accel->max_speed) accel->duty_f = (float)accel->max_speed;
@@ -208,7 +218,7 @@ bool zephyr_accelmotor_tick(zephyr_accelmotor_t *accel, int32_t pos) {
         return zephyr_motor_get_state(accel->motor) != 0;
     } else {
         return (zephyr_motor_get_state(accel->motor) != 0) ||
-               (abs(accel->target_pos - accel->current_pos) > (int32_t)accel->stopzone);
+               (iabs32(accel->target_pos - accel->current_pos) > (int32_t)accel->stopzone);
     }
 }
 
@@ -282,5 +292,5 @@ void zephyr_accelmotor_set_acceleration_deg(zephyr_accelmotor_t *accel, float ac
 
 bool zephyr_accelmotor_is_blocked(zephyr_accelmotor_t *accel) {
     uint16_t min_duty = 0;
-    return (fabs(accel->duty_f) > min_duty && accel->current_speed == 0);
+    return (fabs32(accel->duty_f) > min_duty && accel->current_speed == 0);
 }

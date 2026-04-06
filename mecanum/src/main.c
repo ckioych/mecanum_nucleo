@@ -19,6 +19,9 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 #define ACCEL               7       // ускорение
 #define MAX_FOLLOW_SPEED    500     // макс. скорость слежения
 #define DT_MS               20      // период дискретизации
+#define MOTOR_AUTOTEST_NO_PS2 1     // 1: автотест моторов без геймпада PS2
+#define AUTOTEST_SPEED      45
+#define AUTOTEST_STEP_MS    2000
 
 // ПИД коэф-ты
 #define PID_P   2.2f
@@ -35,22 +38,14 @@ static zephyr_encoder_t enc_fl, enc_fr, enc_bl, enc_br;
 static zephyr_accelmotor_t accel_fl, accel_fr, accel_bl, accel_br;
 
 // PS2 контроллер
+#if !MOTOR_AUTOTEST_NO_PS2
 static ps2_t ps2;
+#endif
+static K_MUTEX_DEFINE(control_lock);
 
 // режим
 static bool position_mode = false;  // false - speed mode, true - position mode
 static int32_t pos_fl = 0, pos_fr = 0, pos_bl = 0, pos_br = 0;
-
-extern const struct device *tim1;
-extern const struct device *tim2;
-extern const struct device *tim3;
-extern const struct device *tim4;
-extern const struct device *tim17;
-extern const struct device *gpiob;
-extern const struct device *gpioe;
-extern const struct device *gpioa;
-extern const struct device *gpioc;
-extern const struct device *gpiod;
 
 static void update_target_positions(void) {
     zephyr_accelmotor_set_target_pos(&accel_fl, pos_fl);
@@ -97,6 +92,12 @@ void motor_control_thread(void *, void *, void *) {
     uint32_t last_print = 0;
 
     while (1) {
+#if MOTOR_AUTOTEST_NO_PS2
+        k_sleep(K_MSEC(100));
+        continue;
+#else
+        k_mutex_lock(&control_lock, K_FOREVER);
+
         // чтение энкодеров
         int32_t enc_fl_val = zephyr_encoder_get_count(&enc_fl);
         int32_t enc_fr_val = zephyr_encoder_get_count(&enc_fr);
@@ -138,7 +139,9 @@ void motor_control_thread(void *, void *, void *) {
             }
         }
 
+        k_mutex_unlock(&control_lock);
         k_sleep(K_MSEC(DT_MS));
+#endif
     }
 }
 
@@ -147,9 +150,49 @@ void ps2_thread(void *, void *, void *) {
     LOG_INF("PS2 thread started");
 
     while (1) {
+#if MOTOR_AUTOTEST_NO_PS2
+        static int last_phase = -1;
+        uint32_t phase = (k_uptime_get_32() / AUTOTEST_STEP_MS) % 3U;
+
+        k_mutex_lock(&control_lock, K_FOREVER);
+
+        if (phase == 0U) {
+            zephyr_motor_set_speed(&motor_fl, AUTOTEST_SPEED);
+            zephyr_motor_set_speed(&motor_fr, AUTOTEST_SPEED);
+            zephyr_motor_set_speed(&motor_bl, AUTOTEST_SPEED);
+            zephyr_motor_set_speed(&motor_br, AUTOTEST_SPEED);
+        } else if (phase == 1U) {
+            zephyr_motor_set_speed(&motor_fl, -AUTOTEST_SPEED);
+            zephyr_motor_set_speed(&motor_fr, -AUTOTEST_SPEED);
+            zephyr_motor_set_speed(&motor_bl, -AUTOTEST_SPEED);
+            zephyr_motor_set_speed(&motor_br, -AUTOTEST_SPEED);
+        } else {
+            zephyr_motor_set_speed(&motor_fl, 0);
+            zephyr_motor_set_speed(&motor_fr, 0);
+            zephyr_motor_set_speed(&motor_bl, 0);
+            zephyr_motor_set_speed(&motor_br, 0);
+        }
+        k_mutex_unlock(&control_lock);
+
+        if ((int)phase != last_phase) {
+            last_phase = (int)phase;
+            if (phase == 0U) {
+                LOG_INF("AUTOTEST: FORWARD");
+            } else if (phase == 1U) {
+                LOG_INF("AUTOTEST: BACKWARD");
+            } else {
+                LOG_INF("AUTOTEST: STOP");
+            }
+        }
+
+        k_sleep(K_MSEC(50));
+        continue;
+#else
         bool success = ps2_read_gamepad(&ps2, false, 0);
 
         if (success) {
+            k_mutex_lock(&control_lock, K_FOREVER);
+
             // кнопки крестовины
             if (ps2_button_pressed(&ps2, PSB_PAD_LEFT)) {
                 LOG_INF("Move LEFT");
@@ -238,25 +281,31 @@ void ps2_thread(void *, void *, void *) {
                 zephyr_accelmotor_set_target_speed(&accel_bl, duty_bl);
                 zephyr_accelmotor_set_target_speed(&accel_br, duty_br);
             }
+
+            k_mutex_unlock(&control_lock);
         } else {
+            k_mutex_lock(&control_lock, K_FOREVER);
             // остановка моторов при потери связи с PS2
             LOG_WRN("PS2 lost, stopping motors");
+            change_mode(false);
             zephyr_accelmotor_set_target_speed(&accel_fl, 0);
             zephyr_accelmotor_set_target_speed(&accel_fr, 0);
             zephyr_accelmotor_set_target_speed(&accel_bl, 0);
             zephyr_accelmotor_set_target_speed(&accel_br, 0);
+            k_mutex_unlock(&control_lock);
         }
 
         k_sleep(K_MSEC(50));
+#endif
     }
 }
 
-static void init_hardware(void) {
+static bool init_hardware(void) {
     LOG_INF("Initializing hardware...");
 
-    const struct device *pwm_dev1 = DEVICE_DT_GET(DT_NODELABEL(tim1));
-    const struct device *pwm_dev2 = DEVICE_DT_GET(DT_NODELABEL(tim2));
-    const struct device *pwm_dev17 = DEVICE_DT_GET(DT_NODELABEL(tim17));
+    const struct device *pwm_dev1 = DEVICE_DT_GET(DT_NODELABEL(pwm1));
+    const struct device *pwm_dev2 = DEVICE_DT_GET(DT_NODELABEL(pwm2));
+    const struct device *pwm_dev17 = DEVICE_DT_GET(DT_NODELABEL(pwm17));
 
     const struct device *gpio_dev_b = DEVICE_DT_GET(DT_NODELABEL(gpiob));
     const struct device *gpio_dev_e = DEVICE_DT_GET(DT_NODELABEL(gpioe));
@@ -264,18 +313,39 @@ static void init_hardware(void) {
     const struct device *gpio_dev_c = DEVICE_DT_GET(DT_NODELABEL(gpioc));
     const struct device *gpio_dev_d = DEVICE_DT_GET(DT_NODELABEL(gpiod));
 
-    const struct device *qdec_fl = DEVICE_DT_GET(DT_NODELABEL(qdec_fl));
-    const struct device *qdec_fr = DEVICE_DT_GET(DT_NODELABEL(qdec_fr));
-    const struct device *qdec_bl = DEVICE_DT_GET(DT_NODELABEL(qdec_bl));
-    const struct device *qdec_br = DEVICE_DT_GET(DT_NODELABEL(qdec_br));
-
     // проверка устройств
-    if (!device_is_ready(pwm_dev1)) LOG_ERR("TIM1 not ready");
-    if (!device_is_ready(pwm_dev2)) LOG_ERR("TIM2 not ready");
-    if (!device_is_ready(pwm_dev17)) LOG_ERR("TIM17 not ready");
-    if (!device_is_ready(gpio_dev_b)) LOG_ERR("GPIOB not ready");
-    if (!device_is_ready(gpio_dev_e)) LOG_ERR("GPIOE not ready");
-    if (!device_is_ready(gpio_dev_a)) LOG_ERR("GPIOA not ready");
+    if (!device_is_ready(pwm_dev1)) {
+        LOG_ERR("TIM1 not ready");
+        return false;
+    }
+    if (!device_is_ready(pwm_dev2)) {
+        LOG_ERR("TIM2 not ready");
+        return false;
+    }
+    if (!device_is_ready(pwm_dev17)) {
+        LOG_ERR("TIM17 not ready");
+        return false;
+    }
+    if (!device_is_ready(gpio_dev_b)) {
+        LOG_ERR("GPIOB not ready");
+        return false;
+    }
+    if (!device_is_ready(gpio_dev_e)) {
+        LOG_ERR("GPIOE not ready");
+        return false;
+    }
+    if (!device_is_ready(gpio_dev_a)) {
+        LOG_ERR("GPIOA not ready");
+        return false;
+    }
+    if (!device_is_ready(gpio_dev_c)) {
+        LOG_ERR("GPIOC not ready");
+        return false;
+    }
+    if (!device_is_ready(gpio_dev_d)) {
+        LOG_ERR("GPIOD not ready");
+        return false;
+    }
 
     // инициализация моторов
     // FL мотор (PB13, PB14, TIM1_CH1/PE9)
@@ -298,10 +368,14 @@ static void init_hardware(void) {
     zephyr_motor_set_min_duty(&motor_br, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_br, MAX_SPEED);
     
-    zephyr_encoder_init(&enc_fl, gpio_dev_b, 6);
-    zephyr_encoder_init(&enc_fr, gpio_dev_c, 6);
-    zephyr_encoder_init(&enc_bl, gpio_dev_e, 8);
-    zephyr_encoder_init(&enc_br, gpio_dev_d, 3);
+    /* In standalone motor autotest we skip encoders/PID stack completely,
+     * so motor actuation cannot fail due to sensor/control init.
+     */
+#if !MOTOR_AUTOTEST_NO_PS2
+    if (!zephyr_encoder_init(&enc_fl, gpio_dev_b, 6)) return false;
+    if (!zephyr_encoder_init(&enc_fr, gpio_dev_c, 6)) return false;
+    if (!zephyr_encoder_init(&enc_bl, gpio_dev_e, 8)) return false;
+    if (!zephyr_encoder_init(&enc_br, gpio_dev_d, 3)) return false;
 
     // инициализация доп. функций моторов
     zephyr_accelmotor_init(&accel_fl, &motor_fl, &enc_fl);
@@ -350,26 +424,43 @@ static void init_hardware(void) {
     accel_fr.kd = PID_D;
     accel_bl.kd = PID_D;
     accel_br.kd = PID_D;
+#endif
 
     // инициализация PS2
-    if (!device_is_ready(gpio_dev_c)) {
-        LOG_ERR("GPIOC device not ready");
+#if MOTOR_AUTOTEST_NO_PS2
+    LOG_WRN("PS2 init skipped: MOTOR_AUTOTEST_NO_PS2=1");
+#else
+    if (!ps2_init(&ps2, gpio_dev_c, 8, 12, 10, 11, false, false)) {
+        LOG_ERR("Failed to initialize PS2 controller");
+        return false;
     } else {
-        if (!ps2_init(&ps2, gpio_dev_c, 8, 12, 10, 11, false, false)) {
-            LOG_ERR("Failed to initialize PS2 controller");
-        } else {
-            LOG_INF("PS2 controller initialized successfully");
-        }
+        LOG_INF("PS2 controller initialized successfully");
     }
+#endif
 
     LOG_INF("Hardware initialization complete");
+    return true;
 }
 
-K_THREAD_DEFINE(motor_tid, 2048, motor_control_thread, NULL, NULL, NULL, 5, 0, 0);
-K_THREAD_DEFINE(ps2_tid, 2048, ps2_thread, NULL, NULL, NULL, 4, 0, 0);
+K_THREAD_STACK_DEFINE(motor_stack, 2048);
+K_THREAD_STACK_DEFINE(ps2_stack, 2048);
+static struct k_thread motor_thread_data;
+static struct k_thread ps2_thread_data;
 
 void main(void) {
     LOG_INF("Starting Mecanum robot on NUCLEO-L496ZG");
-    init_hardware();
+    if (!init_hardware()) {
+        LOG_ERR("Hardware init failed");
+        return;
+    }
+
+    k_thread_create(&motor_thread_data, motor_stack, K_THREAD_STACK_SIZEOF(motor_stack),
+                    motor_control_thread, NULL, NULL, NULL, 5, 0, K_NO_WAIT);
+    k_thread_name_set(&motor_thread_data, "motor_ctrl");
+
+    k_thread_create(&ps2_thread_data, ps2_stack, K_THREAD_STACK_SIZEOF(ps2_stack),
+                    ps2_thread, NULL, NULL, NULL, 4, 0, K_NO_WAIT);
+    k_thread_name_set(&ps2_thread_data, "ps2_ctrl");
+
     LOG_INF("System ready");
 }

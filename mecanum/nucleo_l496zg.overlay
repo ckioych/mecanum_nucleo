@@ -1,289 +1,44 @@
-/ {
-    aliases {
-        pwm-fl = &pwm_fl;
-        pwm-fr = &pwm_fr;
-        pwm-bl = &pwm_bl;
-        pwm-br = &pwm_br;
-        qdec-fl = &qdec_fl;
-        qdec-fr = &qdec_fr;
-        qdec-bl = &qdec_bl;
-        qdec-br = &qdec_br;
-    };
+/*
+ * Overlay for mecanum project on NUCLEO-L496ZG.
+ *
+ * Notes:
+ * - Motor direction, PS2, and speed sensors are configured via GPIO API in code.
+ * - PWM for TIM1/TIM2 is already enabled in board DTS (labels pwm1 and pwm2).
+ * - We additionally enable TIM17 PWM on PA7 for BR motor.
+ */
 
-    // ШИМ для моторов
-    pwm_fl: pwm-fl {
-        compatible = "pwm-leds";
-        pwm-fl-pwm {
-            pwms = <&timers1 1 1000 PWM_POLARITY_NORMAL>; // TIM1_CH1
-        };
-    };
-
-    pwm_fr: pwm-fr {
-        compatible = "pwm-leds";
-        pwm-fr-pwm {
-            pwms = <&timers1 3 1000 PWM_POLARITY_NORMAL>;
-        };
-    };
-
-    pwm_bl: pwm-bl {
-        compatible = "pwm-leds";
-        pwm-bl-pwm {
-            pwms = <&timers2 1 1000 PWM_POLARITY_NORMAL>; // TIM2_CH1
-        };
-    };
-
-    pwm_br: pwm-br {
-        compatible = "pwm-leds";
-        pwm-br-pwm {
-            pwms = <&timers17 1 1000 PWM_POLARITY_NORMAL>; // TIM17_CH1
-        };
-    };
-
-    // GPIO для направления моторов
-    gpio-motor-dir {
-        compatible = "gpio-leds";
-        in_fl_a: in-fl-a { gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>; };
-        in_fl_b: in-fl-b { gpios = <&gpiob 14 GPIO_ACTIVE_HIGH>; };
-        in_fr_a: in-fr-a { gpios = <&gpioe 10 GPIO_ACTIVE_HIGH>; };
-        in_fr_b: in-fr-b { gpios = <&gpioe 11 GPIO_ACTIVE_HIGH>; };
-        in_bl_a: in-bl-a { gpios = <&gpiob 8 GPIO_ACTIVE_HIGH>; };
-        in_bl_b: in-bl-b { gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>; };
-        in_br_a: in-br-a { gpios = <&gpioa 5 GPIO_ACTIVE_HIGH>; };
-        in_br_b: in-br-b { gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>; };
-    };
-
-    // энкодеры
-    qdec_fl: qdec-fl {
-        compatible = "st,stm32-qdec";
-        pinctrl-0 = <&qdec_fl_pins>;
-        pinctrl-names = "default";
-        st,encoder-mode = <2>;
-        status = "okay";
-    };
-
-    qdec_fr: qdec-fr {
-        compatible = "st,stm32-qdec";
-        pinctrl-0 = <&qdec_fr_pins>;
-        pinctrl-names = "default";
-        st,encoder-mode = <2>;
-        status = "okay";
-    };
-
-    qdec_bl: qdec-bl {
-        compatible = "st,stm32-qdec";
-        pinctrl-0 = <&qdec_bl_pins>;
-        pinctrl-names = "default";
-        st,encoder-mode = <2>;
-        status = "okay";
-    };
-
-    qdec_br: qdec-br {
-        compatible = "st,stm32-qdec";
-        pinctrl-0 = <&qdec_br_pins>;
-        pinctrl-names = "default";
-        st,encoder-mode = <2>;
-        status = "okay";
-    };
-
-    // PS2
-    gpio-ps2 {
-        compatible = "gpio-keys";
-        ps2_dat: ps2-dat { gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>; };
-        ps2_cmd: ps2-cmd { gpios = <&gpioc 12 GPIO_ACTIVE_HIGH>; };
-        ps2_sel: ps2-sel { gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>; };
-        ps2_clk: ps2-clk { gpios = <&gpioc 8 GPIO_ACTIVE_HIGH>; };
-    };
-};
-
-&pinctrl {
-    // Энкодеры
-    encoder_pins: encoder_pins {
-        group1 { pinmux = <0x361>; bias-pull-up; };  // PB6 (D71) - FL
-        group2 { pinmux = <0x461>; bias-pull-up; };  // PC6 (D16) - FR
-        group3 { pinmux = <0x4a1>; bias-pull-up; };  // PE8 (D42) - BL
-        group4 { pinmux = <0x6c1>; bias-pull-up; };  // PD3 (D55) - BR
-    };
-
-    // Направление моторов
-    motor_dir_pins: motor_dir_pins {
-        group1 { pinmux = <0x3d1>; };  // PB13 (IN1 FL)
-        group2 { pinmux = <0x3e1>; };  // PB14 (IN2 FL)
-        group3 { pinmux = <0x4a1>; };  // PE10 (IN1 FR)
-        group4 { pinmux = <0x4b1>; };  // PE11 (IN2 FR)
-        group5 { pinmux = <0x381>; };  // PB8 (IN1 BL)
-        group6 { pinmux = <0x391>; };  // PB9 (IN2 BL)
-        group7 { pinmux = <0x151>; };  // PA5 (IN1 BR)
-        group8 { pinmux = <0x161>; };  // PA6 (IN2 BR)
-    };
-
-    // PS2 геймпад
-    ps2_pins: ps2_pins {
-        group1 { pinmux = <0x481>; bias-pull-up; };  // PC8 (CLK)
-        group2 { pinmux = <0x4a1>; bias-pull-up; };  // PC10 (SEL)
-        group3 { pinmux = <0x4b1>; bias-pull-up; };  // PC11 (DAT)
-        group4 { pinmux = <0x4c1>; bias-pull-up; };  // PC12 (CMD)
-    };
-
-    // ШИМ
-    tim1_ch1_pe9: tim1_ch1_pe9 {
-        pinmux = <0x9a1>;  // TIM1_CH1 (PE9) - PWM FL
-    };
-    tim1_ch3_pe13: tim1_ch3_pe13 {
-        pinmux = <0x9a1>;  // TIM1_CH3 (PE13) - PWM FR
-    };
-    tim2_ch1_pa0: tim2_ch1_pa0 {
-        pinmux = <0x101>;  // TIM2_CH1 (PA0) - PWM BL
-    };
-    tim17_ch1_pa7: tim17_ch1_pa7 {
-        pinmux = <0x171>;  // TIM17_CH1 (PA7) - PWM BR
-    };
-
-    // QDEC
-    // Энкодер FL (таймер TIM4, каналы CH1 и CH2)
-    tim4_ch1_pb6_qdec: tim4_ch1_pb6_qdec {
-        pinmux = <0x362>;
-        bias-pull-up;
-    };
-    tim4_ch2_pb7_qdec: tim4_ch2_pb7_qdec {
-        pinmux = <0x372>;
-        bias-pull-up;
-    };
-
-    // Энкодер FR (таймер TIM3, каналы CH1 и CH2)
-    tim3_ch1_pc6_qdec: tim3_ch1_pc6_qdec {
-        pinmux = <0x462>;
-        bias-pull-up;
-    };
-    tim3_ch2_pc7_qdec: tim3_ch2_pc7_qdec {
-        pinmux = <0x472>;
-        bias-pull-up;
-    };
-
-    // Энкодер BL (таймер TIM2, каналы CH1 и CH2)
-    tim2_ch1_pa15_qdec: tim2_ch1_pa15_qdec {
-        pinmux = <0x1f1>;
-        bias-pull-up;
-    };
-    tim2_ch2_pb3_qdec: tim2_ch2_pb3_qdec {
-        pinmux = <0x231>;
-        bias-pull-up;
-    };
-
-    // Энкодер BR (таймер TIM4, каналы CH1 и CH2)
-    tim4_ch1_pd12_qdec: tim4_ch1_pd12_qdec {
-        pinmux = <0x6c2>;
-        bias-pull-up;
-    };
-    tim4_ch2_pd13_qdec: tim4_ch2_pd13_qdec {
-        pinmux = <0x6d2>;
-        bias-pull-up;
-    };
-
-    // ШИМ
-    pwm_fl_pins: pwm_fl_pins {
-        pinmux = <0x9a1>;  // TIM1_CH1 — PWM для FL
-    };
-    pwm_fr_pins: pwm_fr_pins {
-        pinmux = <0x9a1>; // TIM1_CH3 — PWM для FR
-    };
-    pwm_bl_pins: pwm_bl_pins {
-        pinmux = <0x101>;  // TIM2_CH1 — PWM для BL
-    };
-    pwm_br_pins: pwm_br_pins {
-        pinmux = <0x171>; // TIM17_CH1 — PWM для BR
-    };
-
-    // Энкодер BL (таймер TIM2, каналы CH1 и CH2)
-    qdec_bl_pins: qdec_bl_pins {
-        pinmux = <0x1f1 0x231>;  // PA15 (AF1) и PB3 (AF1)
-        bias-pull-up;
-    };
-
-    // Энкодер FR (таймер TIM3, каналы CH1 и CH2)
-    qdec_fr_pins: qdec_fr_pins {
-        pinmux = <0x462 0x472>;  // PC6 (AF2) и PC7 (AF2)
-        bias-pull-up;
-    };
-
-    // Энкодер FL (таймер TIM4, каналы CH1 и CH2)
-    qdec_fl_pins: qdec_fl_pins {
-        pinmux = <0x362 0x372>;  // PB6 (AF2) и PB7 (AF2)
-        bias-pull-up;
-    };
-
-    // Энкодер BR (таймер TIM4, каналы CH1 и CH2)
-    qdec_br_pins: qdec_br_pins {
-        pinmux = <0x6c2 0x6d2>;  // PD12 (AF2) и PD13 (AF2)
-        bias-pull-up;
-    };
-};
-
-// настройка пинов для энкодеров
-&gpiob {
-    status = "okay";
-    pinctrl-0 = <&encoder_pins &motor_dir_pins>;
-    pinctrl-names = "default";
-};
-
-&gpioc {
-    status = "okay";
-    pinctrl-0 = <&encoder_pins &ps2_pins>;
-    pinctrl-names = "default";
+&{/chosen} {
+    zephyr,console = &usart3;
+    zephyr,shell-uart = &usart3;
 };
 
 &gpioa {
     status = "okay";
-    pinctrl-0 = <&encoder_pins &motor_dir_pins>;
-    pinctrl-names = "default";
+};
+
+&gpiob {
+    status = "okay";
+};
+
+&gpioc {
+    status = "okay";
 };
 
 &gpiod {
     status = "okay";
-    pinctrl-0 = <&encoder_pins>;
-    pinctrl-names = "default";
 };
 
-// Таймеры для ШИМ
-&timers1 {
+&gpioe {
     status = "okay";
-    pinctrl-0 = <&pwm_fl_pins &pwm_fr_pins>;
-    pinctrl-names = "default";
-    st,prescaler = <0>;
-};
-
-&timers2 {
-    status = "okay";
-    pinctrl-0 = <&pwm_bl_pins>;
-    pinctrl-names = "default";
-    st,prescaler = <0>;
 };
 
 &timers17 {
     status = "okay";
-    pinctrl-0 = <&pwm_br_pins>;
-    pinctrl-names = "default";
-    st,prescaler = <0>;
-};
+    st,prescaler = <10000>;
 
-&timers4 {
-    status = "okay";
-    pinctrl-0 = <&qdec_fl_pins &qdec_br_pins>;
-    pinctrl-names = "default";
-    st,encoder-mode = <2>;
-};
-
-// Таймер TIM3 (обслуживает энкодер FR)
-&timers3 {
-    status = "okay";
-    pinctrl-0 = <&qdec_fr_pins>;
-    pinctrl-names = "default";
-    st,encoder-mode = <2>;
-};
-
-// Таймер TIM2 (обслуживает энкодер BL)
-&timers2 {
-    status = "okay";
-    pinctrl-0 = <&qdec_bl_pins>;
-    pinctrl-names = "default";
-    st,encoder-mode = <2>;
+    pwm17: pwm {
+        status = "okay";
+        pinctrl-0 = <&tim17_ch1_pa7>;
+        pinctrl-names = "default";
+    };
 };

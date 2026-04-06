@@ -1,0 +1,2 @@
+ccache /home/test/zephyr-sdk-0.17.4/arm-zephyr-eabi/bin/arm-zephyr-eabi-ar qc libdrivers__counter.a CMakeFiles/drivers__counter.dir/counter_ll_stm32_rtc.c.obj
+ccache /home/test/zephyr-sdk-0.17.4/arm-zephyr-eabi/bin/arm-zephyr-eabi-ranlib libdrivers__counter.a

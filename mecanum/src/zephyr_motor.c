@@ -1,7 +1,9 @@
 #include "zephyr_motor.h"
+#include <stdlib.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(motor, LOG_LEVEL_INF);
+static const uint32_t motor_pwm_period_us = 1000U;
 
 static void set_pins(zephyr_motor_t *motor, bool in1_val, bool in2_val) {
     gpio_pin_set(motor->gpio_dev, motor->pin_in1, in1_val);
@@ -66,28 +68,34 @@ void zephyr_motor_run(zephyr_motor_t *motor, motor_mode_t mode, int16_t duty) {
     switch (actual_mode) {
         case MOTOR_FORWARD:
             set_pins(motor, 1, 0);
-            pwm_set_pulse_dt(motor->pwm_dev, motor->pwm_channel,
-                            PWM_USEC(pwm_duty * 1000 / motor->max_duty));
+            pwm_set(motor->pwm_dev, motor->pwm_channel,
+                    PWM_USEC(motor_pwm_period_us),
+                    PWM_USEC((uint32_t)pwm_duty * motor_pwm_period_us / motor->max_duty),
+                    0);
             motor->state = 1;
             break;
 
         case MOTOR_BACKWARD:
             set_pins(motor, 0, 1);
-            pwm_set_pulse_dt(motor->pwm_dev, motor->pwm_channel,
-                            PWM_USEC(pwm_duty * 1000 / motor->max_duty));
+            pwm_set(motor->pwm_dev, motor->pwm_channel,
+                    PWM_USEC(motor_pwm_period_us),
+                    PWM_USEC((uint32_t)pwm_duty * motor_pwm_period_us / motor->max_duty),
+                    0);
             motor->state = -1;
             break;
 
         case MOTOR_BRAKE:
             set_pins(motor, 1, 1);
-            pwm_set_pulse_dt(motor->pwm_dev, motor->pwm_channel, PWM_USEC(0));
+            pwm_set(motor->pwm_dev, motor->pwm_channel,
+                    PWM_USEC(motor_pwm_period_us), PWM_USEC(0), 0);
             motor->state = 0;
             break;
 
         case MOTOR_STOP:
         default:
             set_pins(motor, 0, 0);
-            pwm_set_pulse_dt(motor->pwm_dev, motor->pwm_channel, PWM_USEC(0));
+            pwm_set(motor->pwm_dev, motor->pwm_channel,
+                    PWM_USEC(motor_pwm_period_us), PWM_USEC(0), 0);
             motor->state = 0;
             break;
     }
