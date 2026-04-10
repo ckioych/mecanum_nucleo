@@ -56,7 +56,7 @@
  *   - /soc/pin-controller@48000000/gpio@48002000
  */
 const device_handle_t __aligned(2) __attribute__((__section__(".__device_handles_pass2")))
-__devicehdl_DT_N_S_soc_S_rcc_40021000[] = { DEVICE_HANDLE_SEP, DEVICE_HANDLE_SEP, 5, 16, 7, 8, 12, 6, 18, 19, 4, 9, 14, 11, 10, 17, 13, 3, 15, DEVICE_HANDLE_ENDS };
+__devicehdl_DT_N_S_soc_S_rcc_40021000[] = { DEVICE_HANDLE_SEP, DEVICE_HANDLE_SEP, 12, 18, 19, 4, 9, 14, 11, 10, 17, 13, 3, 15, 5, 16, 6, 7, 8, DEVICE_HANDLE_ENDS };
 
 /* 2 : /soc/interrupt-controller@40010400:
  * Direct Dependencies:

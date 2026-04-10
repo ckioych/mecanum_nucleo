@@ -5,7 +5,7 @@
  *   /home/test/Desktop/projects/mecanum_nucleo/mecanum/build/zephyr/zephyr.dts.pre
  *
  * Directories with bindings:
- *   $ZEPHYR_BASE/dts/bindings
+ *   /home/test/zephyrproject/zephyr/dts/bindings
  *
  * Node dependency ordering (ordinal and path):
  *   0   /
@@ -278,7 +278,7 @@
  * Node identifier: DT_N_S_connector
  *
  * Binding (compatible = arduino-header-r3):
- *   $ZEPHYR_BASE/dts/bindings/gpio/arduino-header-r3.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/arduino-header-r3.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -343,7 +343,7 @@
  * Node identifier: DT_N_S_memory_20000000
  *
  * Binding (compatible = mmio-sram):
- *   $ZEPHYR_BASE/dts/bindings/sram/mmio-sram.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/sram/mmio-sram.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -474,7 +474,7 @@
  * Node identifier: DT_N_S_clocks_S_clk_hse
  *
  * Binding (compatible = st,stm32-hse-clock):
- *   $ZEPHYR_BASE/dts/bindings/clock/st,stm32-hse-clock.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/st,stm32-hse-clock.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -532,7 +532,7 @@
  * Node identifier: DT_N_S_clocks_S_clk_lse
  *
  * Binding (compatible = st,stm32-lse-clock):
- *   $ZEPHYR_BASE/dts/bindings/clock/st,stm32-lse-clock.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/st,stm32-lse-clock.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -593,7 +593,7 @@
  * Node identifier: DT_N_S_clocks_S_clk_lsi
  *
  * Binding (compatible = fixed-clock):
- *   $ZEPHYR_BASE/dts/bindings/clock/fixed-clock.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/fixed-clock.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -651,7 +651,7 @@
  * Node identifier: DT_N_S_clocks_S_clk_msi
  *
  * Binding (compatible = st,stm32-msi-clock):
- *   $ZEPHYR_BASE/dts/bindings/clock/st,stm32-msi-clock.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/st,stm32-msi-clock.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -792,7 +792,7 @@
  * Node identifier: DT_N_S_cpus_S_cpu_0
  *
  * Binding (compatible = arm,cortex-m4f):
- *   $ZEPHYR_BASE/dts/bindings/cpu/arm,cortex-m4f.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/cpu/arm,cortex-m4f.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -865,7 +865,7 @@
  * Node identifier: DT_N_S_gpio_keys
  *
  * Binding (compatible = gpio-keys):
- *   $ZEPHYR_BASE/dts/bindings/gpio/gpio-keys.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/gpio-keys.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1029,7 +1029,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000
  *
  * Binding (compatible = st,stm32-pinctrl):
- *   $ZEPHYR_BASE/dts/bindings/pinctrl/st,stm32-pinctrl.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pinctrl/st,stm32-pinctrl.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1139,7 +1139,7 @@
  * Node identifier: DT_N_S_clocks_S_clk_hsi
  *
  * Binding (compatible = fixed-clock):
- *   $ZEPHYR_BASE/dts/bindings/clock/fixed-clock.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/fixed-clock.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1198,7 +1198,7 @@
  * Node identifier: DT_N_S_clocks_S_pll
  *
  * Binding (compatible = st,stm32l4-pll-clock):
- *   $ZEPHYR_BASE/dts/bindings/clock/st,stm32l4-pll-clock.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/st,stm32l4-pll-clock.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1299,7 +1299,7 @@
  * Node identifier: DT_N_S_soc_S_rcc_40021000
  *
  * Binding (compatible = st,stm32-rcc):
- *   $ZEPHYR_BASE/dts/bindings/clock/st,stm32-rcc.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/clock/st,stm32-rcc.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1445,7 +1445,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48000800
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1658,7 +1658,7 @@
  * Node identifier: DT_N_S_leds
  *
  * Binding (compatible = gpio-leds):
- *   $ZEPHYR_BASE/dts/bindings/gpio/gpio-leds.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/gpio-leds.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -1799,7 +1799,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48000400
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2089,7 +2089,7 @@
  * Node identifier: DT_N_S_pwmleds
  *
  * Binding (compatible = pwm-leds):
- *   $ZEPHYR_BASE/dts/bindings/led/pwm-leds.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/led/pwm-leds.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2145,7 +2145,7 @@
  * Node identifier: DT_N_S_soc_S_interrupt_controller_e000e100
  *
  * Binding (compatible = arm,v7m-nvic):
- *   $ZEPHYR_BASE/dts/bindings/interrupt-controller/arm,v7m-nvic.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/interrupt-controller/arm,v7m-nvic.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2265,7 +2265,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40014000
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2517,7 +2517,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40014000_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2700,7 +2700,7 @@
  * Node identifier: DT_N_S_soc_S_adc_50040000
  *
  * Binding (compatible = st,stm32-adc):
- *   $ZEPHYR_BASE/dts/bindings/adc/st,stm32-adc.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/adc/st,stm32-adc.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2849,7 +2849,7 @@
  * Node identifier: DT_N_S_soc_S_adc_50040100
  *
  * Binding (compatible = st,stm32-adc):
- *   $ZEPHYR_BASE/dts/bindings/adc/st,stm32-adc.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/adc/st,stm32-adc.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -2998,7 +2998,7 @@
  * Node identifier: DT_N_S_soc_S_adc_50040200
  *
  * Binding (compatible = st,stm32-adc):
- *   $ZEPHYR_BASE/dts/bindings/adc/st,stm32-adc.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/adc/st,stm32-adc.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -3147,7 +3147,7 @@
  * Node identifier: DT_N_S_soc_S_can_40006400
  *
  * Binding (compatible = st,stm32-can):
- *   $ZEPHYR_BASE/dts/bindings/can/st,stm32-can.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/can/st,stm32-can.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -3373,7 +3373,7 @@
  * Node identifier: DT_N_S_soc_S_dac_40007400
  *
  * Binding (compatible = st,stm32-dac):
- *   $ZEPHYR_BASE/dts/bindings/dac/st,stm32-dac.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/dac/st,stm32-dac.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -3499,7 +3499,7 @@
  * Node identifier: DT_N_S_soc_S_dma_40020000
  *
  * Binding (compatible = st,stm32-dma-v2):
- *   $ZEPHYR_BASE/dts/bindings/dma/st,stm32-dma-v2.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/dma/st,stm32-dma-v2.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -3730,7 +3730,7 @@
  * Node identifier: DT_N_S_soc_S_dma_40020400
  *
  * Binding (compatible = st,stm32-dma-v2):
- *   $ZEPHYR_BASE/dts/bindings/dma/st,stm32-dma-v2.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/dma/st,stm32-dma-v2.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -4147,7 +4147,7 @@
  * Node identifier: DT_N_S_soc_S_i2c_40005400
  *
  * Binding (compatible = st,stm32-i2c-v2):
- *   $ZEPHYR_BASE/dts/bindings/i2c/st,stm32-i2c-v2.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/i2c/st,stm32-i2c-v2.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -4346,7 +4346,7 @@
  * Node identifier: DT_N_S_soc_S_i2c_40005800
  *
  * Binding (compatible = st,stm32-i2c-v2):
- *   $ZEPHYR_BASE/dts/bindings/i2c/st,stm32-i2c-v2.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/i2c/st,stm32-i2c-v2.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -4524,7 +4524,7 @@
  * Node identifier: DT_N_S_soc_S_i2c_40005c00
  *
  * Binding (compatible = st,stm32-i2c-v2):
- *   $ZEPHYR_BASE/dts/bindings/i2c/st,stm32-i2c-v2.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/i2c/st,stm32-i2c-v2.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -4702,7 +4702,7 @@
  * Node identifier: DT_N_S_soc_S_i2c_40008400
  *
  * Binding (compatible = st,stm32-i2c-v2):
- *   $ZEPHYR_BASE/dts/bindings/i2c/st,stm32-i2c-v2.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/i2c/st,stm32-i2c-v2.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -4880,7 +4880,7 @@
  * Node identifier: DT_N_S_soc_S_interrupt_controller_40010400
  *
  * Binding (compatible = st,stm32-exti):
- *   $ZEPHYR_BASE/dts/bindings/interrupt-controller/st,stm32-exti.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/interrupt-controller/st,stm32-exti.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -4958,7 +4958,7 @@
  * Node identifier: DT_N_S_otgfs_phy
  *
  * Binding (compatible = usb-nop-xceiv):
- *   $ZEPHYR_BASE/dts/bindings/phy/usb-nop-xceiv.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/phy/usb-nop-xceiv.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -5046,7 +5046,7 @@
  * Node identifier: DT_N_S_soc_S_otgfs_50000000
  *
  * Binding (compatible = st,stm32-otgfs):
- *   $ZEPHYR_BASE/dts/bindings/usb/st,stm32-otgfs.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/usb/st,stm32-otgfs.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -5238,7 +5238,7 @@
  * Node identifier: DT_N_S_soc_S_quadspi_a0001000
  *
  * Binding (compatible = st,stm32-qspi):
- *   $ZEPHYR_BASE/dts/bindings/qspi/st,stm32-qspi.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/qspi/st,stm32-qspi.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -5385,7 +5385,7 @@
  * Node identifier: DT_N_S_soc_S_rng_50060800
  *
  * Binding (compatible = st,stm32-rng):
- *   $ZEPHYR_BASE/dts/bindings/rng/st,stm32-rng.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/rng/st,stm32-rng.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -5524,7 +5524,7 @@
  * Node identifier: DT_N_S_soc_S_rtc_40002800
  *
  * Binding (compatible = st,stm32-rtc):
- *   $ZEPHYR_BASE/dts/bindings/rtc/st,stm32-rtc.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/rtc/st,stm32-rtc.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -5661,7 +5661,7 @@
  * Node identifier: DT_N_S_soc_S_sdmmc_40012800
  *
  * Binding (compatible = st,stm32-sdmmc):
- *   $ZEPHYR_BASE/dts/bindings/mmc/st,stm32-sdmmc.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/mmc/st,stm32-sdmmc.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -5994,7 +5994,7 @@
  * Node identifier: DT_N_S_soc_S_serial_40004400
  *
  * Binding (compatible = st,stm32-usart):
- *   $ZEPHYR_BASE/dts/bindings/serial/st,stm32-usart.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/serial/st,stm32-usart.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -6363,7 +6363,7 @@
  * Node identifier: DT_N_S_soc_S_serial_40004800
  *
  * Binding (compatible = st,stm32-usart):
- *   $ZEPHYR_BASE/dts/bindings/serial/st,stm32-usart.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/serial/st,stm32-usart.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -6546,7 +6546,7 @@
  * Node identifier: DT_N_S_soc_S_serial_40004c00
  *
  * Binding (compatible = st,stm32-uart):
- *   $ZEPHYR_BASE/dts/bindings/serial/st,stm32-uart.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/serial/st,stm32-uart.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -6699,7 +6699,7 @@
  * Node identifier: DT_N_S_soc_S_serial_40005000
  *
  * Binding (compatible = st,stm32-uart):
- *   $ZEPHYR_BASE/dts/bindings/serial/st,stm32-uart.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/serial/st,stm32-uart.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -7038,7 +7038,7 @@
  * Node identifier: DT_N_S_soc_S_serial_40008000
  *
  * Binding (compatible = st,stm32-lpuart):
- *   $ZEPHYR_BASE/dts/bindings/serial/st,stm32-lpuart.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/serial/st,stm32-lpuart.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -7222,7 +7222,7 @@
  * Node identifier: DT_N_S_soc_S_serial_40013800
  *
  * Binding (compatible = st,stm32-usart):
- *   $ZEPHYR_BASE/dts/bindings/serial/st,stm32-usart.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/serial/st,stm32-usart.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -7383,7 +7383,7 @@
  * Node identifier: DT_N_S_soc_S_spi_40003800
  *
  * Binding (compatible = st,stm32-spi-fifo):
- *   $ZEPHYR_BASE/dts/bindings/spi/st,stm32-spi-fifo.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/spi/st,stm32-spi-fifo.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -7532,7 +7532,7 @@
  * Node identifier: DT_N_S_soc_S_spi_40003c00
  *
  * Binding (compatible = st,stm32-spi-fifo):
- *   $ZEPHYR_BASE/dts/bindings/spi/st,stm32-spi-fifo.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/spi/st,stm32-spi-fifo.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -7681,7 +7681,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48000c00
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -8095,7 +8095,7 @@
  * Node identifier: DT_N_S_soc_S_spi_40013000
  *
  * Binding (compatible = st,stm32-spi-fifo):
- *   $ZEPHYR_BASE/dts/bindings/spi/st,stm32-spi-fifo.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/spi/st,stm32-spi-fifo.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -8353,7 +8353,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40001000
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -8517,7 +8517,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40001400
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -8681,7 +8681,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40007c00
  *
  * Binding (compatible = st,stm32-lptim):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-lptim.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-lptim.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -8839,7 +8839,7 @@
  * Node identifier: DT_N_S_soc_S_watchdog_40002c00
  *
  * Binding (compatible = st,stm32-window-watchdog):
- *   $ZEPHYR_BASE/dts/bindings/watchdog/st,stm32-window-watchdog.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/watchdog/st,stm32-window-watchdog.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -8972,7 +8972,7 @@
  * Node identifier: DT_N_S_soc_S_watchdog_40003000
  *
  * Binding (compatible = st,stm32-watchdog):
- *   $ZEPHYR_BASE/dts/bindings/watchdog/st,stm32-watchdog.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/watchdog/st,stm32-watchdog.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9085,7 +9085,7 @@
  * Node identifier: DT_N_S_soc_S_flash_controller_40022000
  *
  * Binding (compatible = st,stm32-flash-controller):
- *   $ZEPHYR_BASE/dts/bindings/flash_controller/st,stm32-flash-controller.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/flash_controller/st,stm32-flash-controller.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9222,7 +9222,7 @@
  * Node identifier: DT_N_S_soc_S_flash_controller_40022000_S_flash_8000000
  *
  * Binding (compatible = st,stm32-nv-flash):
- *   $ZEPHYR_BASE/dts/bindings/mtd/st,stm32-nv-flash.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/mtd/st,stm32-nv-flash.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9338,7 +9338,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48000000
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9460,7 +9460,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48001000
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9582,7 +9582,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48001400
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9689,7 +9689,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48001800
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9796,7 +9796,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48001c00
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -9903,7 +9903,7 @@
  * Node identifier: DT_N_S_soc_S_pin_controller_48000000_S_gpio_48002000
  *
  * Binding (compatible = st,stm32-gpio):
- *   $ZEPHYR_BASE/dts/bindings/gpio/st,stm32-gpio.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/gpio/st,stm32-gpio.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10010,7 +10010,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000000
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10260,7 +10260,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000000_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10375,7 +10375,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000400
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10540,7 +10540,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000400_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10641,7 +10641,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000800
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10806,7 +10806,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000800_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -10907,7 +10907,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000c00
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -11072,7 +11072,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40000c00_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -11173,7 +11173,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40012c00
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -11675,7 +11675,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40012c00_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -11804,7 +11804,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40013400
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -12035,7 +12035,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40013400_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -12136,7 +12136,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40014400
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -12303,7 +12303,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40014400_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -12406,7 +12406,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40014800
  *
  * Binding (compatible = st,stm32-timers):
- *   $ZEPHYR_BASE/dts/bindings/timer/st,stm32-timers.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/timer/st,stm32-timers.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
@@ -12658,7 +12658,7 @@
  * Node identifier: DT_N_S_soc_S_timers_40014800_S_pwm
  *
  * Binding (compatible = st,stm32-pwm):
- *   $ZEPHYR_BASE/dts/bindings/pwm/st,stm32-pwm.yaml
+ *   /home/test/zephyrproject/zephyr/dts/bindings/pwm/st,stm32-pwm.yaml
  *
  * (Descriptions have moved to the Devicetree Bindings Index
  * in the documentation.)
