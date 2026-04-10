@@ -10,6 +10,13 @@ static void set_pins(zephyr_motor_t *motor, bool in1_val, bool in2_val) {
     gpio_pin_set(motor->gpio_dev, motor->pin_in2, in2_val);
 }
 
+static void set_pwm(zephyr_motor_t *motor, uint16_t pwm_duty, pwm_flags_t flags) {
+    pwm_set(motor->pwm_dev, motor->pwm_channel,
+            PWM_USEC(motor_pwm_period_us),
+            PWM_USEC((uint32_t)pwm_duty * motor_pwm_period_us / motor->max_duty),
+            flags);
+}
+
 void zephyr_motor_init(zephyr_motor_t *motor,
                        const struct device *pwm_dev, uint32_t pwm_channel,
                        const struct device *gpio_dev, gpio_pin_t in1, gpio_pin_t in2,
@@ -67,35 +74,32 @@ void zephyr_motor_run(zephyr_motor_t *motor, motor_mode_t mode, int16_t duty) {
 
     switch (actual_mode) {
         case MOTOR_FORWARD:
-            set_pins(motor, 1, 0);
-            pwm_set(motor->pwm_dev, motor->pwm_channel,
-                    PWM_USEC(motor_pwm_period_us),
-                    PWM_USEC((uint32_t)pwm_duty * motor_pwm_period_us / motor->max_duty),
-                    0);
+            /* L9110S mode:
+             * - PWM pin drives IA.
+             * - pin_in1 drives IB (direction select): 0 -> forward, 1 -> backward.
+             * - pin_in2 is held low (unused, kept configured for compatibility).
+             */
+            set_pins(motor, 0, 0);
+            set_pwm(motor, pwm_duty, 0);
             motor->state = 1;
             break;
 
         case MOTOR_BACKWARD:
-            set_pins(motor, 0, 1);
-            pwm_set(motor->pwm_dev, motor->pwm_channel,
-                    PWM_USEC(motor_pwm_period_us),
-                    PWM_USEC((uint32_t)pwm_duty * motor_pwm_period_us / motor->max_duty),
-                    0);
+            set_pins(motor, 1, 0);
+            set_pwm(motor, pwm_duty, PWM_POLARITY_INVERTED);
             motor->state = -1;
             break;
 
         case MOTOR_BRAKE:
-            set_pins(motor, 1, 1);
-            pwm_set(motor->pwm_dev, motor->pwm_channel,
-                    PWM_USEC(motor_pwm_period_us), PWM_USEC(0), 0);
+            set_pins(motor, 1, 0);
+            set_pwm(motor, motor->max_duty, 0);
             motor->state = 0;
             break;
 
         case MOTOR_STOP:
         default:
             set_pins(motor, 0, 0);
-            pwm_set(motor->pwm_dev, motor->pwm_channel,
-                    PWM_USEC(motor_pwm_period_us), PWM_USEC(0), 0);
+            set_pwm(motor, 0, 0);
             motor->state = 0;
             break;
     }
