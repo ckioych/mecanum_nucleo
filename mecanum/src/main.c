@@ -14,13 +14,13 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 // конфигурация
 #define MAX_SPEED           70      // макс. скорость в тиках/сек
-#define MIN_DUTY            50      // минимальный ШИМ для трогания с места
+#define MIN_DUTY            20      // минимальный ШИМ для трогания с места
 #define STEP_SIZE           50      // шаг перемещения по кнопкам
 #define ACCEL               7       // ускорение
 #define MAX_FOLLOW_SPEED    500     // макс. скорость слежения
 #define DT_MS               20      // период дискретизации
 #define MOTOR_AUTOTEST_NO_PS2 1     // 1: автотест моторов без геймпада PS2
-#define AUTOTEST_SPEED      45
+#define AUTOTEST_SPEED      30      // сниженный duty для щадящего теста силовой части
 #define AUTOTEST_STEP_MS    2000
 
 // ПИД коэф-ты
@@ -31,17 +31,17 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 // моторы
 static zephyr_motor_t motor_fl, motor_fr, motor_bl, motor_br;
 
+#if !MOTOR_AUTOTEST_NO_PS2
 // энкодеры
 static zephyr_encoder_t enc_fl, enc_fr, enc_bl, enc_br;
 
 // доп. функции моторов
 static zephyr_accelmotor_t accel_fl, accel_fr, accel_bl, accel_br;
+#endif
 
 // PS2 контроллер
 #if !MOTOR_AUTOTEST_NO_PS2
 static ps2_t ps2;
-#endif
-static K_MUTEX_DEFINE(control_lock);
 
 // режим
 static bool position_mode = false;  // false - speed mode, true - position mode
@@ -84,18 +84,20 @@ static void change_mode(bool mode) {
         LOG_INF("Switched to SPEED mode");
     }
 }
+#endif
+
+static K_MUTEX_DEFINE(control_lock);
 
 // управление моторами
 void motor_control_thread(void *, void *, void *) {
     LOG_INF("Motor control thread started");
-
-    uint32_t last_print = 0;
 
     while (1) {
 #if MOTOR_AUTOTEST_NO_PS2
         k_sleep(K_MSEC(100));
         continue;
 #else
+        static uint32_t last_print = 0;
         k_mutex_lock(&control_lock, K_FOREVER);
 
         // чтение энкодеров
@@ -347,24 +349,29 @@ static bool init_hardware(void) {
         return false;
     }
 
-    // инициализация моторов
-    // FL мотор (PB13, PB14, TIM1_CH1/PE9)
-    zephyr_motor_init(&motor_fl, pwm_dev1, 1, gpio_dev_b, 13, 14, false);
+    /* L9110S wiring model:
+     * - PWM pin goes to x-1A.
+     * - DIR pin goes to x-1B.
+     * Each channel therefore uses one PWM output and one GPIO direction pin.
+     */
+
+    // FL мотор: DIR PB13 (A-1B), PWM TIM1_CH1/PE9 (A-1A)
+    zephyr_motor_init(&motor_fl, pwm_dev1, 1, gpio_dev_b, 13, false);
     zephyr_motor_set_min_duty(&motor_fl, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_fl, MAX_SPEED);
 
-    // FR мотор (PE10, PE11, TIM1_CH3/PE13)
-    zephyr_motor_init(&motor_fr, pwm_dev1, 3, gpio_dev_e, 10, 11, false);
+    // FR мотор: DIR PE10 (A-1B), PWM TIM1_CH3/PE13 (A-1A)
+    zephyr_motor_init(&motor_fr, pwm_dev1, 3, gpio_dev_e, 10, false);
     zephyr_motor_set_min_duty(&motor_fr, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_fr, MAX_SPEED);
 
-    // BL мотор (PB8, PB9, TIM2_CH1/PA0)
-    zephyr_motor_init(&motor_bl, pwm_dev2, 1, gpio_dev_b, 8, 9, false);
+    // BL мотор: DIR PB8 (B-1B), PWM TIM2_CH1/PA0 (B-1A)
+    zephyr_motor_init(&motor_bl, pwm_dev2, 1, gpio_dev_b, 8, false);
     zephyr_motor_set_min_duty(&motor_bl, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_bl, MAX_SPEED);
 
-    // BR мотор (PA5, PA6, TIM17_CH1/PA7)
-    zephyr_motor_init(&motor_br, pwm_dev17, 1, gpio_dev_a, 5, 6, false);
+    // BR мотор: DIR PA5 (B-1B), PWM TIM17_CH1/PA7 (B-1A)
+    zephyr_motor_init(&motor_br, pwm_dev17, 1, gpio_dev_a, 5, false);
     zephyr_motor_set_min_duty(&motor_br, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_br, MAX_SPEED);
     

@@ -23,8 +23,7 @@ typedef struct {
     const struct device *pwm_dev;
     uint32_t pwm_channel;
     const struct device *gpio_dev;
-    gpio_pin_t pin_in1;
-    gpio_pin_t pin_in2;
+    gpio_pin_t pin_dir;
 
     bool reversed;
     motor_mode_t last_mode;
@@ -38,7 +37,7 @@ typedef struct {
 // инициализация
 void zephyr_motor_init(zephyr_motor_t *motor,
                        const struct device *pwm_dev, uint32_t pwm_channel,
-                       const struct device *gpio_dev, gpio_pin_t in1, gpio_pin_t in2,
+                       const struct device *gpio_dev, gpio_pin_t dir_pin,
                        bool reverse);
 
 // основ. функции

@@ -5,9 +5,8 @@
 LOG_MODULE_REGISTER(motor, LOG_LEVEL_INF);
 static const uint32_t motor_pwm_period_us = 1000U;
 
-static void set_pins(zephyr_motor_t *motor, bool in1_val, bool in2_val) {
-    gpio_pin_set(motor->gpio_dev, motor->pin_in1, in1_val);
-    gpio_pin_set(motor->gpio_dev, motor->pin_in2, in2_val);
+static void set_direction(zephyr_motor_t *motor, bool dir_val) {
+    gpio_pin_set(motor->gpio_dev, motor->pin_dir, dir_val);
 }
 
 static void set_pwm(zephyr_motor_t *motor, uint16_t pwm_duty, pwm_flags_t flags) {
@@ -19,13 +18,12 @@ static void set_pwm(zephyr_motor_t *motor, uint16_t pwm_duty, pwm_flags_t flags)
 
 void zephyr_motor_init(zephyr_motor_t *motor,
                        const struct device *pwm_dev, uint32_t pwm_channel,
-                       const struct device *gpio_dev, gpio_pin_t in1, gpio_pin_t in2,
+                       const struct device *gpio_dev, gpio_pin_t dir_pin,
                        bool reverse) {
     motor->pwm_dev = pwm_dev;
     motor->pwm_channel = pwm_channel;
     motor->gpio_dev = gpio_dev;
-    motor->pin_in1 = in1;
-    motor->pin_in2 = in2;
+    motor->pin_dir = dir_pin;
     motor->reversed = reverse;
     motor->last_mode = MOTOR_STOP;
     motor->state = 0;
@@ -43,10 +41,10 @@ void zephyr_motor_init(zephyr_motor_t *motor,
         return;
     }
 
-    gpio_pin_configure(gpio_dev, in1, GPIO_OUTPUT);
-    gpio_pin_configure(gpio_dev, in2, GPIO_OUTPUT);
+    gpio_pin_configure(gpio_dev, dir_pin, GPIO_OUTPUT);
 
-    set_pins(motor, 0, 0);
+    set_direction(motor, 0);
+    set_pwm(motor, 0, 0);
 
     LOG_INF("Motor initialized on PWM channel %d", pwm_channel);
 }
@@ -54,7 +52,8 @@ void zephyr_motor_init(zephyr_motor_t *motor,
 void zephyr_motor_run(zephyr_motor_t *motor, motor_mode_t mode, int16_t duty) {
     if (motor->deadtime_us > 0 && mode != motor->last_mode) {
         motor->last_mode = mode;
-        set_pins(motor, 0, 0);
+        set_direction(motor, 0);
+        set_pwm(motor, 0, 0);
         k_busy_wait(motor->deadtime_us);
     }
 
@@ -74,31 +73,27 @@ void zephyr_motor_run(zephyr_motor_t *motor, motor_mode_t mode, int16_t duty) {
 
     switch (actual_mode) {
         case MOTOR_FORWARD:
-            /* L9110S mode:
-             * - PWM pin drives IA.
-             * - pin_in1 drives IB (direction select): 0 -> forward, 1 -> backward.
-             * - pin_in2 is held low (unused, kept configured for compatibility).
-             */
-            set_pins(motor, 0, 0);
+            /* L9110S uses one PWM input and one direction-select input. */
+            set_direction(motor, 0);
             set_pwm(motor, pwm_duty, 0);
             motor->state = 1;
             break;
 
         case MOTOR_BACKWARD:
-            set_pins(motor, 1, 0);
+            set_direction(motor, 1);
             set_pwm(motor, pwm_duty, PWM_POLARITY_INVERTED);
             motor->state = -1;
             break;
 
         case MOTOR_BRAKE:
-            set_pins(motor, 1, 0);
+            set_direction(motor, 1);
             set_pwm(motor, motor->max_duty, 0);
             motor->state = 0;
             break;
 
         case MOTOR_STOP:
         default:
-            set_pins(motor, 0, 0);
+            set_direction(motor, 0);
             set_pwm(motor, 0, 0);
             motor->state = 0;
             break;
