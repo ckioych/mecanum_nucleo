@@ -14,13 +14,13 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 // конфигурация
 #define MAX_SPEED           70      // макс. скорость в тиках/сек
-#define MIN_DUTY            20      // минимальный ШИМ для трогания с места
+#define MIN_DUTY            30      // минимальный ШИМ для трогания с места
 #define STEP_SIZE           50      // шаг перемещения по кнопкам
 #define ACCEL               7       // ускорение
 #define MAX_FOLLOW_SPEED    500     // макс. скорость слежения
 #define DT_MS               20      // период дискретизации
 #define MOTOR_AUTOTEST_NO_PS2 1     // 1: автотест моторов без геймпада PS2
-#define AUTOTEST_SPEED      30      // сниженный duty для щадящего теста силовой части
+#define AUTOTEST_SPEED      35      // сниженный duty для щадящего теста силовой части
 #define AUTOTEST_STEP_MS    2000
 
 // ПИД коэф-ты
@@ -354,8 +354,8 @@ static bool init_hardware(void) {
     zephyr_motor_set_min_duty(&motor_fl, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_fl, MAX_SPEED);
 
-    // FR мотор: DIR PE10 (A-1B), PWM TIM1_CH3/PE13 (A-1A)
-    zephyr_motor_init(&motor_fr, pwm_dev1, 3, gpio_dev_e, 10, false);
+    // FR мотор: DIR PE10 (A-1B), PWM TIM1_CH2/PE11 (A-1A)
+    zephyr_motor_init(&motor_fr, pwm_dev1, 2, gpio_dev_e, 10, false);
     zephyr_motor_set_min_duty(&motor_fr, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_fr, MAX_SPEED);
 
