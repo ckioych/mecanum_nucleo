@@ -349,12 +349,6 @@ static bool init_hardware(void) {
         return false;
     }
 
-    /* L9110S wiring model:
-     * - PWM pin goes to x-1A.
-     * - DIR pin goes to x-1B.
-     * Each channel therefore uses one PWM output and one GPIO direction pin.
-     */
-
     // FL мотор: DIR PB13 (A-1B), PWM TIM1_CH1/PE9 (A-1A)
     zephyr_motor_init(&motor_fl, pwm_dev1, 1, gpio_dev_b, 13, false);
     zephyr_motor_set_min_duty(&motor_fl, MIN_DUTY);
@@ -375,9 +369,7 @@ static bool init_hardware(void) {
     zephyr_motor_set_min_duty(&motor_br, MIN_DUTY);
     zephyr_motor_set_max_duty(&motor_br, MAX_SPEED);
     
-    /* In standalone motor autotest we skip encoders/PID stack completely,
-     * so motor actuation cannot fail due to sensor/control init.
-     */
+
 #if !MOTOR_AUTOTEST_NO_PS2
     if (!zephyr_encoder_init(&enc_fl, gpio_dev_b, 6)) return false;
     if (!zephyr_encoder_init(&enc_fr, gpio_dev_c, 6)) return false;
